@@ -2,15 +2,15 @@ package provider
 
 import (
 	"context"
-	"os"
-	// TODO: Import your Jumpcloud client here
-	//"github.com/Spotnana-Tech/sec-jumpcloud-client-go"
+	"github.com/Spotnana-Tech/sec-jumpcloud-client-go"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"os"
+	"strings"
 )
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -46,6 +46,11 @@ type jumpcloudProviderModel struct {
 	ApiKey types.String `tfsdk:"apikey"`
 }
 
+type jumpcloudGroupModel struct {
+	Name        types.String `tfsdk:"name"`
+	Description types.String `tfsdk:"description"`
+}
+
 // Schema defines the provider-level schema for configuration data.
 func (p *jumpcloudProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
@@ -68,6 +73,11 @@ func (p *jumpcloudProvider) Configure(ctx context.Context, req provider.Configur
 	}
 	// If practitioner provided a configuration value for any of the
 	// attributes, it must be a known value.
+	apiKey := os.Getenv("JC_API_KEY")
+	config.ApiKey = types.StringValue(apiKey)
+	if !config.ApiKey.IsNull() {
+		apiKey = config.ApiKey.ValueString()
+	}
 
 	if config.ApiKey.IsUnknown() {
 		resp.Diagnostics.AddAttributeError(
@@ -80,11 +90,6 @@ func (p *jumpcloudProvider) Configure(ctx context.Context, req provider.Configur
 
 	if resp.Diagnostics.HasError() {
 		return
-	}
-
-	apiKey := os.Getenv("JC_API_KEY")
-	if !config.ApiKey.IsNull() {
-		apiKey = config.ApiKey.ValueString()
 	}
 
 	// If any of the expected configurations are missing, return
@@ -104,28 +109,33 @@ func (p *jumpcloudProvider) Configure(ctx context.Context, req provider.Configur
 		return
 	}
 
-	// TODO: Implement JumpCloud go client here...
 	// Create a new jumpcloudProvider client using the configuration values
-	//client, err := jumpcloud.NewClient(&apiKey)
-	//if err != nil {
-	//	resp.Diagnostics.AddError(
-	//		"Unable to Create JumpCloud API Client",
-	//		"An unexpected error occurred when creating the JumpCloud API client. "+
-	//			"If the error is not clear, please contact the provider developers.\n\n"+
-	//			"JumpCloud Client Error: " + err.Error(),
-	//	)
-	//	return
-	//}
+	// TODO: rename the main jumpcloud client to something more meaningful
+	// TODO: pass keys in to this client, instead of through instantiating
+	client, err := jcclient.NewClient(apiKey)
+
+	if err != nil || !strings.Contains(client.HostURL.String(), "console.jumpcloud.com") {
+		resp.Diagnostics.AddError(
+			"Unable to Create JumpCloud API Client",
+			"An unexpected error occurred when creating the JumpCloud API client. "+
+				"If the error is not clear, please contact the provider developers.\n\n"+
+				// TODO implement better error handling in JC client
+				"JumpCloud Client Error: "+err.Error(),
+		)
+		return
+	}
 
 	// Make the JumpCloud  client available during DataSource and Resource
-	// type Configure methods.
-	//resp.DataSourceData = client
-	//resp.ResourceData = client
+	//type Configure methods.
+	resp.DataSourceData = client
+	resp.ResourceData = client
 }
 
 // DataSources defines the data sources implemented in the provider.
 func (p *jumpcloudProvider) DataSources(_ context.Context) []func() datasource.DataSource {
-	return nil
+	return []func() datasource.DataSource{
+		NewjcUserGroupDataSource,
+	}
 }
 
 // Resources defines the resources implemented in the provider.

@@ -6,8 +6,14 @@ terraform {
   }
 }
 
+variable "api_key" {
+  type = string
+  sensitive = true
+}
 provider "snjumpcloud" {
-  apikey = "abc123"
+    apikey = var.api_key
 }
 
-data "snjumpcloud_usergroup" "example_usergroup" {}
+data "snjumpcloud_group_persona" "example_persona" {}
+
+// terraform plan -var "api_key=$JC_API_KEY"
