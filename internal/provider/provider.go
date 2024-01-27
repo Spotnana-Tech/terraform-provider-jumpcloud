@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"os"
 	"strings"
 )
@@ -64,6 +65,8 @@ func (p *jumpcloudProvider) Schema(_ context.Context, _ provider.SchemaRequest, 
 
 // Configure prepares a JumpCloud API client for data sources and resources.
 func (p *jumpcloudProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
+	tflog.Info(ctx, "Configuring Jumpcloud client")
+
 	// Retrieve provider data from configuration
 	var config jumpcloudProviderModel
 	diags := req.Config.Get(ctx, &config)
@@ -109,6 +112,11 @@ func (p *jumpcloudProvider) Configure(ctx context.Context, req provider.Configur
 		return
 	}
 
+	ctx = tflog.SetField(ctx, "jumpcloud_host", jcclient.HostURL)
+	ctx = tflog.SetField(ctx, "api_key", apiKey)
+	ctx = tflog.MaskFieldValuesWithFieldKeys(ctx, "api_key") // Mask the API key in the logs
+
+	tflog.Debug(ctx, "Creating Jumpcloud client")
 	// Create a new jumpcloudProvider client using the configuration values
 	// TODO: rename the main jumpcloud client to something more meaningful
 	// TODO: pass keys in to this client, instead of through instantiating
@@ -129,6 +137,7 @@ func (p *jumpcloudProvider) Configure(ctx context.Context, req provider.Configur
 	//type Configure methods.
 	resp.DataSourceData = client
 	resp.ResourceData = client
+	tflog.Info(ctx, "Configured Jumpcloud client", map[string]any{"success": true})
 }
 
 // DataSources defines the data sources implemented in the provider.
@@ -140,5 +149,7 @@ func (p *jumpcloudProvider) DataSources(_ context.Context) []func() datasource.D
 
 // Resources defines the resources implemented in the provider.
 func (p *jumpcloudProvider) Resources(_ context.Context) []func() resource.Resource {
-	return nil
+	return []func() resource.Resource{
+		NewUserGroupsResource,
+	}
 }

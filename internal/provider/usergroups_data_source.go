@@ -19,51 +19,51 @@ var (
 
 // jcUserGroupsModel maps the provider schema data to a Go type.
 type jcUserGroupsModel struct {
-	//Attributes struct {
-	//	Sudo struct {
-	//		Enabled         types.Bool `tfsdk:"enabled"`
-	//		WithoutPassword types.Bool `tfsdk:"withoutPassword"`
-	//	} `tfsdk:"sudo"`
-	//	LdapGroups []struct {
-	//		Name types.String `tfsdk:"name"`
-	//	} `tfsdk:"ldapGroups"`
-	//	PosixGroups []struct {
-	//		ID   types.Int64  `tfsdk:"id"`
-	//		Name types.String `tfsdk:"name"`
-	//	} `tfsdk:"posixGroups"`
-	//	Radius struct {
-	//		Reply []struct {
-	//			Name  types.String `tfsdk:"name"`
-	//			Value types.String `tfsdk:"value"`
-	//		} `tfsdk:"reply"`
-	//	} `tfsdk:"radius"`
-	//	SambaEnabled types.Bool `tfsdk:"sambaEnabled"`
-	//} `tfsdk:"attributes"`
+	Attributes struct {
+		Sudo struct {
+			Enabled         types.Bool `tfsdk:"enabled"`
+			WithoutPassword types.Bool `tfsdk:"withoutPassword"`
+		} `tfsdk:"sudo"`
+		LdapGroups []struct {
+			Name types.String `tfsdk:"name"`
+		} `tfsdk:"ldapGroups"`
+		PosixGroups []struct {
+			ID   types.Int64  `tfsdk:"id"`
+			Name types.String `tfsdk:"name"`
+		} `tfsdk:"posixGroups"`
+		Radius struct {
+			Reply []struct {
+				Name  types.String `tfsdk:"name"`
+				Value types.String `tfsdk:"value"`
+			} `tfsdk:"reply"`
+		} `tfsdk:"radius"`
+		SambaEnabled types.Bool `tfsdk:"sambaEnabled"`
+	} `tfsdk:"attributes"`
 	Description types.String `tfsdk:"description"`
-	//Email       types.String `tfsdk:"email"`
-	ID types.String `tfsdk:"id"`
-	//MemberQuery struct {
-	//	QueryType types.String `tfsdk:"queryType"`
-	//	Filters   []struct {
-	//		Field    types.String `tfsdk:"field"`
-	//		Operator types.String `tfsdk:"operator"`
-	//		Value    types.String `tfsdk:"value"`
-	//	} `tfsdk:"filters"`
-	//} `tfsdk:"memberQuery"`
-	//MemberQueryExemptions []struct {
-	//	Attributes struct {
-	//	} `tfsdk:"attributes"`
-	//	ID   types.String `tfsdk:"id"`
-	//	Type types.String `tfsdk:"type"`
-	//} `tfsdk:"memberQueryExemptions"`
-	//MemberSuggestionsNotify types.Bool   `tfsdk:"memberSuggestionsNotify"`
-	MembershipMethod types.String `tfsdk:"membership_method"`
-	Name             types.String `tfsdk:"name"`
-	//SuggestionCounts        struct {
-	//	Add    int `tfsdk:"add"`
-	//	Remove int `tfsdk:"remove"`
-	//	Total  int `tfsdk:"total"`
-	//} `tfsdk:"suggestionCounts"`
+	Email       types.String `tfsdk:"email"`
+	ID          types.String `tfsdk:"id"`
+	MemberQuery struct {
+		QueryType types.String `tfsdk:"queryType"`
+		Filters   []struct {
+			Field    types.String `tfsdk:"field"`
+			Operator types.String `tfsdk:"operator"`
+			Value    types.String `tfsdk:"value"`
+		} `tfsdk:"filters"`
+	} `tfsdk:"memberQuery"`
+	MemberQueryExemptions []struct {
+		Attributes struct {
+		} `tfsdk:"attributes"`
+		ID   types.String `tfsdk:"id"`
+		Type types.String `tfsdk:"type"`
+	} `tfsdk:"memberQueryExemptions"`
+	MemberSuggestionsNotify types.Bool   `tfsdk:"memberSuggestionsNotify"`
+	MembershipMethod        types.String `tfsdk:"membership_method"`
+	Name                    types.String `tfsdk:"name"`
+	SuggestionCounts        struct {
+		Add    int `tfsdk:"add"`
+		Remove int `tfsdk:"remove"`
+		Total  int `tfsdk:"total"`
+	} `tfsdk:"suggestionCounts"`
 	Type types.String `tfsdk:"type"`
 }
 
