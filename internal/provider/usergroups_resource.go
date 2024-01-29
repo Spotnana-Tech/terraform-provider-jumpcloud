@@ -262,8 +262,8 @@ func (r *jcUserGroupsResource) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 	// Get refreshed group value from jcclient
-	tflog.Info(ctx, fmt.Sprintf("Looking Up GroupId: %v", state.ID.ValueString()))
-	group, err := r.client.GetUserGroup(state.ID.ValueString())
+	tflog.Info(ctx, fmt.Sprintf("Looking Up GroupId: %v", state))
+	group, err := r.client.GetUserGroupByName(state.Name.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Reading Jumpcloud Group",
@@ -271,14 +271,14 @@ func (r *jcUserGroupsResource) Read(ctx context.Context, req resource.ReadReques
 		)
 		return
 	}
-
+	result := group[0]
 	// Overwrite items with refreshed state
 	state = CreateUserGroup{
-		Description: types.StringValue(group.Description),
-		ID:          types.StringValue(group.ID),
-		Name:        types.StringValue(group.Name),
-		Email:       types.StringValue(group.Email),
-		Type:        types.StringValue(group.Type),
+		Description: types.StringValue(result.Description),
+		ID:          types.StringValue(result.ID),
+		Name:        types.StringValue(result.Name),
+		Email:       types.StringValue(result.Email),
+		Type:        types.StringValue(result.Type),
 	}
 
 	// Set refreshed state

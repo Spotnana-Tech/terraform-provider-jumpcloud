@@ -21,6 +21,10 @@ github.com/Spotnana-Tech/sec-jumpcloud-client-go v0.1.2-0.20240126231959-763079b
 github.com/Spotnana-Tech/sec-jumpcloud-client-go v0.1.2-0.20240126231959-763079b320b9/go.mod h1:FITFevtvgtUboJQUzh+N/okRQa9p3eZjQHyufDkMxvY=
 github.com/Spotnana-Tech/sec-jumpcloud-client-go v0.1.2-0.20240127213059-ea7cde82657f h1:3MxMwDJEeIkRF5jwOpvkQaTRqeUhriQw7fW/EE2U3uQ=
 github.com/Spotnana-Tech/sec-jumpcloud-client-go v0.1.2-0.20240127213059-ea7cde82657f/go.mod h1:FITFevtvgtUboJQUzh+N/okRQa9p3eZjQHyufDkMxvY=
+github.com/Spotnana-Tech/sec-jumpcloud-client-go v0.1.2-0.20240129190826-187358c409d2 h1:liD82I23cKm2MC/Vdyy4gYiQV48j9ZkrrMTpzzZ71K4=
+github.com/Spotnana-Tech/sec-jumpcloud-client-go v0.1.2-0.20240129190826-187358c409d2/go.mod h1:FITFevtvgtUboJQUzh+N/okRQa9p3eZjQHyufDkMxvY=
+github.com/Spotnana-Tech/sec-jumpcloud-client-go v0.1.2-0.20240129191357-0ec7e3a1fdf5 h1:jnHY37WStk+8GofuFpiiXYQHPYRVaCfdL09vvuWzjV4=
+github.com/Spotnana-Tech/sec-jumpcloud-client-go v0.1.2-0.20240129191357-0ec7e3a1fdf5/go.mod h1:FITFevtvgtUboJQUzh+N/okRQa9p3eZjQHyufDkMxvY=
 github.com/acomagu/bufpipe v1.0.4 h1:e3H4WUzM3npvo5uv95QuJM3cQspFNtFBzvJ2oNjKIDQ=
 github.com/acomagu/bufpipe v1.0.4/go.mod h1:mxdxdup/WdsKVreO5GpW4+M/1CE2sMG4jeGJ2sYmHc4=
 github.com/agext/levenshtein v1.2.2 h1:0S/Yg6LYmFJ5stwQeRp6EeOcCbj7xiqQSdNelsXvaqE=
