@@ -265,14 +265,14 @@ func (r *jcUserGroupsResource) Read(ctx context.Context, req resource.ReadReques
 		)
 		return
 	}
-	result := group[0] // We only want the first result
+
 	// Overwrite items with refreshed state
 	state = CreateUserGroup{
-		Description: types.StringValue(result.Description),
-		ID:          types.StringValue(result.ID),
-		Name:        types.StringValue(result.Name),
-		Email:       types.StringValue(result.Email),
-		Type:        types.StringValue(result.Type),
+		Description: types.StringValue(group.Description),
+		ID:          types.StringValue(group.ID),
+		Name:        types.StringValue(group.Name),
+		Email:       types.StringValue(group.Email),
+		Type:        types.StringValue(group.Type),
 	}
 
 	// Set refreshed state
