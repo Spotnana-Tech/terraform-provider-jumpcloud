@@ -143,6 +143,7 @@ type NewUserGroup struct {
 
 // Metadata returns the resource type name.
 func (r *jcUserGroupsResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	// Resources that end with this string will be routed to this resource implementation.
 	resp.TypeName = req.ProviderTypeName + "_usergroup"
 }
 
@@ -213,7 +214,6 @@ func (r *jcUserGroupsResource) Create(ctx context.Context, req resource.CreateRe
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	tflog.Info(ctx, fmt.Sprintf("PLAN: %v", plan))
 	// Cast local model to client model
 	group := jcclient.UserGroup{
 		Name:        plan.Name.ValueString(),
@@ -221,11 +221,7 @@ func (r *jcUserGroupsResource) Create(ctx context.Context, req resource.CreateRe
 		Type:        plan.Type.ValueString(),
 		Email:       plan.Email.ValueString(),
 	}
-	//for _, item := range plan {
-	//	groups = append(groups, jcclient.UserGroup(item))
-	//}
-
-	// Create new order
+	// Create new group
 	newGroup, err := r.client.CreateUserGroup(group)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -237,14 +233,12 @@ func (r *jcUserGroupsResource) Create(ctx context.Context, req resource.CreateRe
 	tflog.Info(ctx, fmt.Sprintf("Created Jumpcloud User Group: %s", newGroup.Name))
 
 	// Map response body to schema and populate Computed attribute values
-	plan.ID = types.StringValue(newGroup.ID)
 	plan = CreateUserGroup{
 		Description: types.StringValue(newGroup.Description),
 		Name:        types.StringValue(newGroup.Name),
 		Email:       types.StringValue(newGroup.Email),
 		Type:        types.StringValue(newGroup.Type),
 	}
-	tflog.Info(ctx, fmt.Sprintf("Created Jumpcloud User Group: %v", newGroup.Name))
 	// Set state to fully populated data
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
@@ -262,7 +256,7 @@ func (r *jcUserGroupsResource) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 	// Get refreshed group value from jcclient
-	tflog.Info(ctx, fmt.Sprintf("Looking Up GroupId: %v", state))
+	tflog.Info(ctx, fmt.Sprintf("Looking Up Group Name: %v", state.Name.ValueString()))
 	group, err := r.client.GetUserGroupByName(state.Name.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -271,7 +265,7 @@ func (r *jcUserGroupsResource) Read(ctx context.Context, req resource.ReadReques
 		)
 		return
 	}
-	result := group[0]
+	result := group[0] // We only want the first result
 	// Overwrite items with refreshed state
 	state = CreateUserGroup{
 		Description: types.StringValue(result.Description),
@@ -303,6 +297,7 @@ func (r *jcUserGroupsResource) Configure(_ context.Context, req resource.Configu
 		return
 	}
 
+	// This is where we import our client for this type of resource!
 	client, ok := req.ProviderData.(*jcclient.Client)
 
 	if !ok {
