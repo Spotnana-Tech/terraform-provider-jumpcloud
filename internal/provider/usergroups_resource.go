@@ -6,6 +6,7 @@ import (
 	jcclient "github.com/Spotnana-Tech/sec-jumpcloud-client-go"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -158,13 +159,21 @@ func (r *jcUserGroupsResource) Schema(_ context.Context, _ resource.SchemaReques
 				Required: true,
 			},
 			"description": schema.StringAttribute{
-				Required: true,
+				MarkdownDescription: "User Group Description",
+				Optional:            true,
+				Computed:            true,
+				Default:             stringdefault.StaticString("UserGroup Managed by Terraform Provider snjumpcloud"),
 			},
 			"type": schema.StringAttribute{
-				Computed: true,
+				MarkdownDescription: "User Group Description",
+				Optional:            true,
+				Computed:            true,
+				Default:             stringdefault.StaticString("user_group"),
 			},
 			"email": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
+				Default:  stringdefault.StaticString(""),
 			},
 			//"membership_method": schema.StringAttribute{
 			//	Computed: true,
