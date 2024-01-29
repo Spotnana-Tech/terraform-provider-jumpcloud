@@ -165,10 +165,7 @@ func (r *jcUserGroupsResource) Schema(_ context.Context, _ resource.SchemaReques
 				Default:             stringdefault.StaticString("UserGroup Managed by Terraform Provider snjumpcloud"),
 			},
 			"type": schema.StringAttribute{
-				MarkdownDescription: "User Group Description",
-				Optional:            true,
-				Computed:            true,
-				Default:             stringdefault.StaticString("user_group"),
+				Computed: true,
 			},
 			"email": schema.StringAttribute{
 				Computed: true,
@@ -243,6 +240,7 @@ func (r *jcUserGroupsResource) Create(ctx context.Context, req resource.CreateRe
 
 	// Map response body to schema and populate Computed attribute values
 	plan = CreateUserGroup{
+		ID:          types.StringValue(newGroup.ID),
 		Description: types.StringValue(newGroup.Description),
 		Name:        types.StringValue(newGroup.Name),
 		Email:       types.StringValue(newGroup.Email),
