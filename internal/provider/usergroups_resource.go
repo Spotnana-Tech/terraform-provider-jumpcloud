@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	jcclient "github.com/Spotnana-Tech/sec-jumpcloud-client-go"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
@@ -13,8 +14,9 @@ import (
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
-	_ resource.Resource              = &jcUserGroupsResource{}
-	_ resource.ResourceWithConfigure = &jcUserGroupsResource{}
+	_ resource.Resource                = &jcUserGroupsResource{}
+	_ resource.ResourceWithConfigure   = &jcUserGroupsResource{}
+	_ resource.ResourceWithImportState = &jcUserGroupsResource{}
 )
 
 // NewUserGroupsResource is a helper function to simplify the provider implementation.
@@ -27,119 +29,14 @@ type jcUserGroupsResource struct {
 	client *jcclient.Client
 }
 
-// orderResourceModel maps the resource schema data.
-type userGroupsResourceModel struct {
-	ID          types.String `tfsdk:"id"`
-	Items       []UserGroup  `tfsdk:"user_groups"`
-	LastUpdated types.String `tfsdk:"last_updated"`
-}
-
-type UserGroups []UserGroup
-
-type UserGroup struct {
-	//Attributes struct {
-	//	Sudo struct {
-	//		Enabled         bool `tfsdk:"enabled"`
-	//		WithoutPassword bool `tfsdk:"withoutPassword"`
-	//	} `tfsdk:"sudo"`
-	//	LdapGroups []struct {
-	//		Name string `tfsdk:"name"`
-	//	} `tfsdk:"ldap_groups"`
-	//	PosixGroups []struct {
-	//		ID   int    `tfsdk:"id"`
-	//		Name string `tfsdk:"name"`
-	//	} `tfsdk:"posix_groups"`
-	//	Radius struct {
-	//		Reply []struct {
-	//			Name  string `tfsdk:"name"`
-	//			Value string `tfsdk:"value"`
-	//		} `tfsdk:"reply"`
-	//	} `tfsdk:"radius"`
-	//	SambaEnabled bool `tfsdk:"samba_enabled"`
-	//} `tfsdk:"attributes"`
-	Description string `tfsdk:"description"`
-	Email       string `tfsdk:"email"`
-	ID          string `tfsdk:"id"`
-	MemberQuery struct {
-		QueryType string `tfsdk:"query_type"`
-		Filters   []struct {
-			Field    string `tfsdk:"field"`
-			Operator string `tfsdk:"operator"`
-			Value    string `tfsdk:"value"`
-		} `tfsdk:"filters"`
-	} `tfsdk:"member_query"`
-	//MemberQueryExemptions []struct {
-	//	Attributes struct {
-	//	} `tfsdk:"attributes"`
-	//	ID   string `tfsdk:"id"`
-	//	Type string `tfsdk:"type"`
-	//} `tfsdk:"member_query_exemptions"`
-	MemberSuggestionsNotify bool   `tfsdk:"member_suggestions_notify"`
-	MembershipMethod        string `tfsdk:"membership_method"`
-	Name                    string `tfsdk:"name"`
-	//SuggestionCounts        struct {
-	//	Add    int `tfsdk:"add"`
-	//	Remove int `tfsdk:"remove"`
-	//	Total  int `tfsdk:"total"`
-	//} `tfsdk:"suggestion_counts"`
-	Type string `tfsdk:"type"`
-}
-type CreateUserGroup struct {
+// UserGroupResourceModel is the local model for this resource type.
+type UserGroupResourceModel struct {
 	ID          types.String `tfsdk:"id"`
 	Name        types.String `tfsdk:"name"`
 	Description types.String `tfsdk:"description"`
 	Type        types.String `tfsdk:"type"`
 	Email       types.String `tfsdk:"email"`
 	//MemberQuery types.Map    `tfsdk:"member_query"`
-}
-
-type NewUserGroup struct {
-	//Attributes struct {
-	//	Sudo struct {
-	//		Enabled         bool `tfsdk:"enabled"`
-	//		WithoutPassword bool `tfsdk:"without_password"`
-	//	} `tfsdk:"sudo"`
-	//	LdapGroups []struct {
-	//		Name string `tfsdk:"name"`
-	//	} `tfsdk:"ldap_groups"`
-	//	PosixGroups []struct {
-	//		ID   int    `tfsdk:"id"`
-	//		Name string `tfsdk:"name"`
-	//	} `tfsdk:"posix_groups"`
-	//	Radius struct {
-	//		Reply []struct {
-	//			Name  string `tfsdk:"name"`
-	//			Value string `tfsdk:"value"`
-	//		} `tfsdk:"reply"`
-	//	} `tfsdk:"radius"`
-	//	SambaEnabled bool `tfsdk:"samba_enabled"`
-	//} `tfsdk:"attributes"`
-	Description string `tfsdk:"description"`
-	Email       string `tfsdk:"email"`
-	ID          string `tfsdk:"id"`
-	MemberQuery struct {
-		QueryType string `tfsdk:"query_type"`
-		Filters   []struct {
-			Field    string `tfsdk:"field"`
-			Operator string `tfsdk:"operator"`
-			Value    string `tfsdk:"value"`
-		} `tfsdk:"filters"`
-	} `tfsdk:"member_query"`
-	//MemberQueryExemptions []struct {
-	//	Attributes struct {
-	//	} `tfsdk:"attributes"`
-	//	ID   string `tfsdk:"id"`
-	//	Type string `tfsdk:"type"`
-	//} `tfsdk:"member_query_exemptions"`
-	MemberSuggestionsNotify bool   `tfsdk:"member_suggestions_notify"`
-	MembershipMethod        string `tfsdk:"membership_method"`
-	Name                    string `tfsdk:"name"`
-	//SuggestionCounts        struct {
-	//	Add    int `tfsdk:"add"`
-	//	Remove int `tfsdk:"remove"`
-	//	Total  int `tfsdk:"total"`
-	//} `tfsdk:"suggestion_counts"`
-	Type string `tfsdk:"type"`
 }
 
 // Metadata returns the resource type name.
@@ -214,7 +111,7 @@ func (r *jcUserGroupsResource) Schema(_ context.Context, _ resource.SchemaReques
 // Create creates the resource and sets the initial Terraform state.
 func (r *jcUserGroupsResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
-	var plan CreateUserGroup
+	var plan UserGroupResourceModel
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -239,7 +136,7 @@ func (r *jcUserGroupsResource) Create(ctx context.Context, req resource.CreateRe
 	tflog.Info(ctx, fmt.Sprintf("Created Jumpcloud User Group: %s", newGroup.Name))
 
 	// Map response body to schema and populate Computed attribute values
-	plan = CreateUserGroup{
+	plan = UserGroupResourceModel{
 		ID:          types.StringValue(newGroup.ID),
 		Description: types.StringValue(newGroup.Description),
 		Name:        types.StringValue(newGroup.Name),
@@ -256,15 +153,16 @@ func (r *jcUserGroupsResource) Create(ctx context.Context, req resource.CreateRe
 
 // Read refreshes the Terraform state with the latest data.
 func (r *jcUserGroupsResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var state CreateUserGroup
+	var state UserGroupResourceModel
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 	// Get refreshed group value from jcclient
-	tflog.Info(ctx, fmt.Sprintf("Looking Up Group Name: %v", state.Name.ValueString()))
-	group, err := r.client.GetUserGroupByName(state.Name.ValueString())
+	tflog.Info(ctx, fmt.Sprintf("Looking Up Group ID: %s", state.ID.ValueString()))
+	group, err := r.client.GetUserGroup(state.ID.ValueString())
+
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Reading Jumpcloud Group",
@@ -274,7 +172,7 @@ func (r *jcUserGroupsResource) Read(ctx context.Context, req resource.ReadReques
 	}
 
 	// Overwrite items with refreshed state
-	state = CreateUserGroup{
+	state = UserGroupResourceModel{
 		Description: types.StringValue(group.Description),
 		ID:          types.StringValue(group.ID),
 		Name:        types.StringValue(group.Name),
@@ -292,10 +190,69 @@ func (r *jcUserGroupsResource) Read(ctx context.Context, req resource.ReadReques
 
 // Update updates the resource and sets the updated Terraform state on success.
 func (r *jcUserGroupsResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	// Retrieve values from plan and state
+	var plan, state UserGroupResourceModel
+	diags := req.Plan.Get(ctx, &plan)
+	resp.Diagnostics.Append(diags...)
+	diags = req.State.Get(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	tflog.Info(ctx, fmt.Sprintf("STATE ID: %s", state.ID.ValueString()))
+
+	// Cast local model to client model
+	groupModification := jcclient.UserGroup{
+		Name:        plan.Name.ValueString(),
+		Description: plan.Description.ValueString(),
+	}
+
+	// Update group, reference the state's group Id
+	group, err := r.client.UpdateUserGroup(state.ID.ValueString(), groupModification)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error Modifying Group",
+			"Could not modify Group ID "+state.ID.ValueString()+": "+err.Error(),
+		)
+		return
+	}
+	tflog.Info(ctx, fmt.Sprintf("Group Name: %s", group.Name))
+	tflog.Info(ctx, fmt.Sprintf("Group Desc: %s", group.Description))
+	tflog.Info(ctx, fmt.Sprintf("Group ID: %s", group.ID))
+
+	plan = UserGroupResourceModel{
+		Description: types.StringValue(group.Description),
+		ID:          types.StringValue(group.ID),
+		Name:        types.StringValue(group.Name),
+		Email:       types.StringValue(state.Email.ValueString()),
+	}
+
+	diags = resp.State.Set(ctx, plan)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 }
 
 // Delete deletes the resource and removes the Terraform state on success.
 func (r *jcUserGroupsResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	var state UserGroupResourceModel
+	diags := req.State.Get(ctx, &state)
+	tflog.Info(ctx, fmt.Sprintf("STATE: %s", state.ID.ValueString()))
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Delete existing group
+	err := r.client.DeleteUserGroup(state.ID.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error Deleting UserGroup",
+			"Could not delete user group, unexpected error: "+err.Error(),
+		)
+		return
+	}
 }
 
 // Configure adds the provider configured client to the resource.
@@ -317,4 +274,9 @@ func (r *jcUserGroupsResource) Configure(_ context.Context, req resource.Configu
 	}
 
 	r.client = client
+}
+
+func (r *jcUserGroupsResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	// Retrieve import ID and save to id attribute
+	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }

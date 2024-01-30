@@ -19,16 +19,16 @@ Build the provider using the Go `install` command:
 go install .
 ```
 
-While this provider is in alpha, we will be using a local build of the provider. Using this command to reference the local build using the dummy URL.
+While this provider is in alpha, we will be using a local build of the provider. Using this command to force terraform to reference the local build using the dummy URL.
 
 ```shell
-p=~/go/bin # or wherever your $GOPATH is
+export SN_GOPATH=~/go/bin 
 
 cat > ~/.terraformrc <<EOF
 provider_installation {
 
   dev_overrides {
-     "test.com/Spotnana-Tech/snjumpcloud" = "$p"
+     "test.com/Spotnana-Tech/snjumpcloud" = "$SN_GOPATH"  
   }
 
   # For all other providers, install them directly from their origin provider
@@ -39,21 +39,43 @@ provider_installation {
 EOF
 ```
 
-
-## Adding Dependencies
-
-This provider uses [Go modules](https://github.com/golang/go/wiki/Modules).
-Please see the Go documentation for the most up to date information about using Go modules.
-
-To add a new dependency `github.com/author/dependency` to your Terraform provider:
-
-```shell
-go get github.com/Spotnana-Tech/sec-jumpcloud-client-go
-go mod tidy
-```
-
-Then commit the changes to `go.mod` and `go.sum`.
-
 ## Using the provider
 
 See [examples](examples) for usage and consult [Spotnana Security & Trust](https://spotnana.slack.com/archives/C03SV2FGLN7) team for help
+```terraform
+terraform {
+  required_providers {
+    snjumpcloud = {
+      # This dummy URL is used to force Terraform to use the local build
+      source = "test.com/Spotnana-Tech/snjumpcloud" 
+    }
+  }
+}
+# TF_VAR_api_key=$JUMPCLOUD_API_KEY
+variable "api_key" {
+  type      = string
+  sensitive = true
+}
+provider "snjumpcloud" {
+  apikey = var.api_key
+}
+
+resource "snjumpcloud_usergroup" "example_group" {
+  name        = "example-terraform-group"
+  description = "This group was created by Spotnana Terraform Provider!"
+}
+
+output "group_id" {
+  value = snjumpcloud_usergroup.example_group.id
+  description = "The ID of the group"
+}
+```
+
+## Import existing resources
+To simply manage the state of a resource, import it via the CLI
+```shell
+terraform import snjumpcloud_usergroup.example_groupname <<EXAMPLE_GROUP_ID>>
+```
+
+To prepare for a whole organization import, see
+[this documentation](https://developer.hashicorp.com/terraform/language/import)
