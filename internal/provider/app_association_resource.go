@@ -41,31 +41,6 @@ type Association struct {
 	GroupName types.String `tfsdk:"group_name"`
 }
 
-// AppAssociationResourceModel is the local model for this resource type.
-// This may be wrong? Using API schema here but need to use TF provider schema above
-type AppAssociationResourceModel []struct {
-	ID                 types.String        `tfsdk:"app_id"`
-	Type               types.String        `tfsdk:"type"`
-	Name               types.String        `tfsdk:"name"`
-	CompiledAttributes *CompiledAttributes `tfsdk:"compiledAttributes"`
-	Paths              *PathAttributes     `tfsdk:"paths"`
-}
-type CompiledAttributes struct {
-	LdapGroups *LdapGroups `tfsdk:"ldapGroups"`
-}
-type LdapGroups []struct {
-	Name types.String `tfsdk:"name"`
-}
-type PathAttributes [][]struct {
-	Attributes types.Map `tfsdk:"attributes"`
-	To         *To       `tfsdk:"to"`
-}
-type To struct {
-	Attributes *CompiledAttributes `tfsdk:"attributes"`
-	ID         types.String        `tfsdk:"id"`
-	Type       types.String        `tfsdk:"type"`
-}
-
 // Configure adds the provider configuration to the resource.
 func (r *jcAppAssociationResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	if req.ProviderData == nil {
@@ -140,7 +115,7 @@ func (r *jcAppAssociationResource) Read(ctx context.Context, req resource.ReadRe
 	tflog.Info(ctx, fmt.Sprintf("State: %v", state))
 	tflog.Info(ctx, fmt.Sprintf("Looking Up App ID: %s %s", state.ID.ValueString(), state.Name.ValueString()))
 	app, err := r.client.GetApplication(state.ID.ValueString())
-	tflog.Info(ctx, fmt.Sprintf("Looked Up App ID: %s %s", app.ID, app.DisplayName))
+	tflog.Info(ctx, fmt.Sprintf("Look Up Results: %s %s", app.ID, app.DisplayName))
 	associations, err := r.client.GetAppAssociations(state.ID.ValueString(), "user_group")
 	tflog.Info(ctx, fmt.Sprintf("Associations: %s", associations))
 

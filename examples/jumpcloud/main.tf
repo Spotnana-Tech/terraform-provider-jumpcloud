@@ -14,12 +14,43 @@ provider "snjumpcloud" {
   apikey = var.api_key
 }
 
-resource "snjumpcloud_usergroup" "my_group" {
-  name        = "example-terraform-group"
-  description = "A test group created by Terraform"
+# Pulls all usergroups from the JumpCloud API
+data "snjumpcloud_usergroups" "all_usergroups" {
 }
 
-output "usergroup_id" {
-  value = snjumpcloud_usergroup.my_group.id
-  description = "The ID of the group"
+locals {
+  # filter the usergroups to only include those that start with "SEC-"
+  sec_groups = [
+    for g in data.snjumpcloud_usergroups.all_usergroups.usergroups : g.id
+    if startswith(g.name, "SEC-") # && g.name != "SEC-Admins"
+  ]
+  # Different types of list comprehensions
+  # [groupid, groupid, ...]
+  all_test_groups = [
+    for g in data.snjumpcloud_usergroups.all_usergroups.usergroups : g.id
+    if startswith(g.name, "test")
+  ]
+  # {groupname: groupid, groupname: groupid, ...}
+  other_groups = {
+  for g in data.snjumpcloud_usergroups.all_usergroups.usergroups : g.name => g.id
+  if startswith(g.name, "test")
+  }
+}
+
+output "all_usergroups" {
+  value = data.snjumpcloud_usergroups.all_usergroups
+  description = "The usergroup data available in the JumpCloud API"
+}
+output "number_of_usergroups" {
+  value = length(data.snjumpcloud_usergroups.all_usergroups.usergroups)
+  description = "The number of usergroups available in the JumpCloud API"
+}
+output "sec_groups" {
+  value = local.sec_groups
+}
+output "z_ll_test_groups" {
+  value = local.all_test_groups
+}
+output "z_other_groups" {
+  value = local.other_groups
 }
