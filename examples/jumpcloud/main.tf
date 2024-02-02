@@ -15,8 +15,7 @@ provider "snjumpcloud" {
 }
 
 # Pulls all usergroups from the JumpCloud API
-data "snjumpcloud_usergroups" "all_usergroups" {
-}
+data "snjumpcloud_usergroups" "all_usergroups" {}
 
 locals {
   # filter the usergroups to only include those that start with "SEC-"
