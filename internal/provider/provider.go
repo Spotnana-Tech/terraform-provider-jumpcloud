@@ -47,11 +47,6 @@ type jumpcloudProviderModel struct {
 	ApiKey types.String `tfsdk:"apikey"`
 }
 
-type jumpcloudGroupModel struct {
-	Name        types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-}
-
 // Schema defines the provider-level schema for configuration data.
 func (p *jumpcloudProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
@@ -151,5 +146,6 @@ func (p *jumpcloudProvider) DataSources(_ context.Context) []func() datasource.D
 func (p *jumpcloudProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewUserGroupsResource,
+		NewAppAssociationResource,
 	}
 }

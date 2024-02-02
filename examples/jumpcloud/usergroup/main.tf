@@ -15,11 +15,11 @@ provider "snjumpcloud" {
 }
 
 resource "snjumpcloud_usergroup" "example_group" {
-  name        = "example-terraform-group-changed-TEST"
+  name        = "example-terraform-group"
   description = "This group was created by Spotnana Terraform Provider!"
 }
 
-output "group_id" {
-  value = snjumpcloud_usergroup.example_group.id
+output "group_details" {
+  value = snjumpcloud_usergroup.example_group
   description = "The ID of the group"
 }

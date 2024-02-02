@@ -7,15 +7,19 @@ terraform {
 }
 
 variable "api_key" {
-  type = string
+  type      = string
   sensitive = true
 }
 provider "snjumpcloud" {
   apikey = var.api_key
 }
 
-data "snjumpcloud_usergroup" "allusergroups" {}
+resource "snjumpcloud_usergroup" "my_group" {
+  name        = "example-terraform-group"
+  description = "A test group created by Terraform"
+}
 
-output "allusergroups" {
-  value = data.snjumpcloud_usergroup.allusergroups
+output "usergroup_id" {
+  value = snjumpcloud_usergroup.my_group.id
+  description = "The ID of the group"
 }
