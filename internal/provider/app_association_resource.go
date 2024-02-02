@@ -34,7 +34,7 @@ type AppAssociationSchemaModel struct {
 	Name             types.String `tfsdk:"name"`
 	DisplayName      types.String `tfsdk:"display_name"`
 	DisplayLabel     types.String `tfsdk:"display_label"`
-	AssociatedGroups types.List   `tfsdk:"associated_groups"`
+	AssociatedGroups types.Set    `tfsdk:"associated_groups"`
 }
 type Association struct {
 	GroupID   types.String `tfsdk:"group_id"`
@@ -111,32 +111,15 @@ func (r *jcAppAssociationResource) Schema(_ context.Context, _ resource.SchemaRe
 				Optional: true,
 				Computed: true,
 			},
-			"associated_groups": schema.ListAttribute{
+			// Set attribute does not care about order
+			"associated_groups": schema.SetAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
-				Sensitive:           false,
 				Description:         "Group IDs associated with this app",
 				MarkdownDescription: "",
 				DeprecationMessage:  "",
 			},
-			// OLD structure of []map[string]types.String -- clunky syntax
-			//"associated_groups": schema.ListNestedAttribute{
-			//	Optional: true,
-			//	Computed: true,
-			//	NestedObject: schema.NestedAttributeObject{
-			//		Attributes: map[string]schema.Attribute{
-			//			"group_id": schema.StringAttribute{
-			//				Optional: true,
-			//				Computed: true,
-			//			},
-			//			"group_name": schema.StringAttribute{
-			//				Optional: true,
-			//				Computed: true,
-			//			},
-			//		},
-			//	},
-			//},
 		},
 	}
 }
@@ -168,21 +151,15 @@ func (r *jcAppAssociationResource) Read(ctx context.Context, req resource.ReadRe
 		)
 		return
 	}
-	// A temp holder for associations
-	var structuredAssociations []map[string]types.String // Old structure of []map[string]types.String
-	var idAssociations []attr.Value
 
+	// A temp holder for associations
+	var idAssociations []attr.Value
 	// Iterate through our app associations
 	for _, a := range associations {
-		_id := a.To.ID                              // App ID
-		_name := a.To.Attributes.LdapGroups[0].Name // App display name buried way down in this data structure :(
-		temp := map[string]types.String{"group_id": types.StringValue(_id),
-			"group_name": types.StringValue(_name),
-		}
-		structuredAssociations = append(structuredAssociations, temp)
+		_id := a.To.ID // App ID
 		idAssociations = append(idAssociations, types.StringValue(_id))
 	}
-	appAssociations, _ := types.ListValue(types.StringType, idAssociations)
+	appAssociations, _ := types.SetValue(types.StringType, idAssociations)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -212,8 +189,8 @@ func (r *jcAppAssociationResource) Update(ctx context.Context, req resource.Upda
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	oldstate, _ := state.AssociatedGroups.ToListValue(ctx)
-	newstate, _ := plan.AssociatedGroups.ToListValue(ctx)
+	oldstate, _ := state.AssociatedGroups.ToSetValue(ctx)
+	newstate, _ := plan.AssociatedGroups.ToSetValue(ctx)
 	tflog.Info(ctx, fmt.Sprintf("OLD: %v", oldstate))
 	tflog.Info(ctx, fmt.Sprintf("NEW: %v", newstate))
 
@@ -240,6 +217,7 @@ func (r *jcAppAssociationResource) Update(ctx context.Context, req resource.Upda
 	if resp.Diagnostics.HasError() {
 		return
 	}
+	// For each group in our new configuration
 	for _, group := range newElements {
 		tflog.Info(ctx, fmt.Sprintf("Checking %s now...\n", group))
 		// if group is not in the old state, associate it
@@ -249,6 +227,7 @@ func (r *jcAppAssociationResource) Update(ctx context.Context, req resource.Upda
 			err = r.client.AssociateGroupWithApp(state.ID.ValueString(), group)
 		}
 	}
+	// For each group in our old configuration
 	for _, group := range oldElements {
 		if !slices.Contains(newElements, group) {
 			tflog.Info(ctx, fmt.Sprintf("Group %s is no longer associated with this app\n", group))
@@ -264,7 +243,9 @@ func (r *jcAppAssociationResource) Update(ctx context.Context, req resource.Upda
 	for _, a := range associations {
 		idAssociations = append(idAssociations, types.StringValue(a.To.ID))
 	}
-	appAssociations, _ := types.ListValue(types.StringType, idAssociations)
+	appAssociations, _ := types.SetValue(types.StringType, idAssociations)
+	tflog.Info(ctx, fmt.Sprintf("CurrentAssociated Groups: %s\n\n", state.AssociatedGroups.Elements()))
+	tflog.Info(ctx, fmt.Sprintf("Associations: %s\n\n", appAssociations.Elements()))
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
