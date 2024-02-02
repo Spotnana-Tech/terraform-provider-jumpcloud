@@ -38,7 +38,11 @@ provider_installation {
 }
 EOF
 ```
-
+### Test your installation
+Navigate to the test directory and check the plan. If the plan is successful, the provider is installed correctly.
+```shell
+cd ./examples/jumpcloud/confirm_install && terraform plan
+```
 ## Using the provider
 
 See [examples](examples) for usage and consult [Spotnana Security & Trust](https://spotnana.slack.com/archives/C03SV2FGLN7) team for help
@@ -95,6 +99,7 @@ output "test_groups" {
 }
 ```
 See the [examples](examples/jumpcloud) for more provider usage examples.
+
 
 ## Import existing resources
 To simply manage the state of a resource, import it via the CLI
