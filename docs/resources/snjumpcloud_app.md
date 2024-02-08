@@ -17,7 +17,6 @@ description: |-
 
 ### Optional
 
-- `app_id` (String)
 - `associated_groups` (Set of String) This is a set of group IDs associated with this app.
 - `display_label` (String)
 - `name` (String)
@@ -25,3 +24,4 @@ description: |-
 ### Read-Only
 
 - `display_name` (String)
+- `id` (String) The ID of this resource.
