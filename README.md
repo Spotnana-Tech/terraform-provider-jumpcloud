@@ -1,9 +1,8 @@
 # Jumpcloud Terraform Provider
 A Terraform provider for managing Jumpcloud resources.
 
-## Requirements
+### Requirements
 - [Spotnana Jumpcloud Go Client](https://github.com/Spotnana-Tech/sec-jumpcloud-client-go) >= 0.0.2
-- [Jumpcloud](https://console.jumpcloud.com/) API Key in environment variable `JC_API_KEY`
 - [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.0
 - [Go](https://golang.org/doc/install) >= 1.20
 
@@ -38,12 +37,8 @@ provider_installation {
 }
 EOF
 ```
-### Test your installation
-Navigate to the test directory and check the plan. If the plan is successful, the provider is installed correctly.
-```shell
-cd ./examples/jumpcloud/confirm_install && terraform plan
-```
-## Using the provider
+
+## Testing the provider
 See [examples](examples) for usage and consult [Spotnana Security & Trust](https://spotnana.slack.com/archives/C03SV2FGLN7) team for help
 
 While using local build of the provider, compact warnings to avoid long warnings in the output
@@ -55,59 +50,24 @@ Set the required environment variables
 ```shell
 export TF_VAR_api_key=<<YOUR_JUMPCLOUD_API_KEY>>
 ```
-
-
-```terraform
-terraform {
-  required_providers {
-    snjumpcloud = {
-      # This dummy URL is used to force Terraform to use the local build
-      source = "test.com/Spotnana-Tech/snjumpcloud" 
-    }
-  }
-}
-variable "api_key" {
-  type      = string
-  sensitive = true  
-}
-provider "snjumpcloud" {
-  apikey = var.api_key
-}
-
-# Pulls all usergroups from the JumpCloud API
-data "snjumpcloud_usergroups" "all_usergroups" {}
-
-locals {
-  # filter the usergroups to only include those that start with "test"
-  test_groups = [
-    for g in data.snjumpcloud_usergroups.all_usergroups.usergroups : g.id
-    if startswith(g.name, "test")
-  ]
-}
-
-resource "snjumpcloud_usergroup" "example_group" {
-  name        = "example-terraform-group"
-  description = "This group was created by Spotnana Terraform Provider!"
-}
-
-output "group_id" {
-  value = snjumpcloud_usergroup.example_group.id
-  description = "The ID of the created group"
-}
+Navigate to the example directory and check the plan. If the plan is successful, the provider is installed correctly.
+```shell
+cd ./examples/jumpcloud/confirm_install && terraform plan
 ```
-See the [examples](examples/jumpcloud) for more provider usage examples.
+
+See the [examples](examples/snjumpcloud) for more provider usage examples.
 
 
-## Import existing resources via 
+## Import existing resources
 
 Add an import block to the Terraform configuration file for the resource you want to import.
 ```terraform
 import {
-  to = snjumpcloud_app_association.example_app
+  to = snjumpcloud_app.example_app
   id = "6abcd1230987654321" # The `app_id` of the application in Jumpcloud
 }
 ```
-Generate a .tf file for the resource you want to import.
+Generate a `.tf` file for the resource you want to import.
 ```shell
 terraform plan -generate-config-out="generated.tf"
 ```
