@@ -16,6 +16,6 @@ provider "snjumpcloud" {
 data "snjumpcloud_usergroups" "all_usergroups" {}
 
 output "number_of_usergroups" {
-  value = length(data.snjumpcloud_usergroups.all_usergroups.usergroups)
+  value       = length(data.snjumpcloud_usergroups.all_usergroups.usergroups)
   description = "The number of usergroups available in the JumpCloud API"
 }

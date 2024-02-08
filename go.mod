@@ -5,7 +5,7 @@ go 1.21
 toolchain go1.21.5
 
 require (
-	github.com/Spotnana-Tech/sec-jumpcloud-client-go v0.1.2-0.20240129231127-3afdb06442ed
+	github.com/Spotnana-Tech/sec-jumpcloud-client-go v0.1.3-0.20240206224737-6fc4137242b8
 	github.com/hashicorp/terraform-plugin-docs v0.16.0
 	github.com/hashicorp/terraform-plugin-framework v1.4.2
 	github.com/hashicorp/terraform-plugin-go v0.20.0

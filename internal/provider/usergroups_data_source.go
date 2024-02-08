@@ -26,6 +26,7 @@ type jcUserGroupsModel struct {
 }
 
 // jcUserGroupsDataSourceModel maps the data source schema data.
+// TODO: Update this struct value to types.ListType or types.SetType
 type jcUserGroupsDataSourceModel struct {
 	UserGroups []jcUserGroupsModel `tfsdk:"usergroups"`
 }
@@ -36,7 +37,7 @@ func NewjcUserGroupDataSource() datasource.DataSource {
 }
 
 // jcUserGroupDataSource is the data source implementation.
-// This struct accepts a client pointer to the JumpCloud API client so terraform can make its changes to the system
+// This struct accepts a client pointer to the JumpCloud Go client so terraform can make its changes to the system
 type jcUserGroupDataSource struct {
 	client *jcclient.Client
 }
@@ -77,6 +78,7 @@ func (d *jcUserGroupDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 
 // Read refreshes the Terraform state with the latest data.
 func (d *jcUserGroupDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	// Get all user groups
 	var state jcUserGroupsDataSourceModel
 	groups, err := d.client.GetAllUserGroups()
 	if err != nil {
@@ -87,6 +89,7 @@ func (d *jcUserGroupDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 	tflog.Info(ctx, fmt.Sprintf("Read Jumpcloud User Groups: %v", len(groups)))
+
 	// Map response to state
 	for _, group := range groups {
 		jcUserGroupState := jcUserGroupsModel{
@@ -97,6 +100,7 @@ func (d *jcUserGroupDataSource) Read(ctx context.Context, req datasource.ReadReq
 		}
 		state.UserGroups = append(state.UserGroups, jcUserGroupState)
 	}
+
 	// Set state
 	diags := resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -112,13 +116,13 @@ func (d *jcUserGroupDataSource) Configure(_ context.Context, req datasource.Conf
 		return
 	}
 
+	// This is where we import our client for this type of data source
 	client, ok := req.ProviderData.(*jcclient.Client)
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Data Source Configure Type",
 			fmt.Sprintf("Expected *hashicups.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
-
 		return
 	}
 

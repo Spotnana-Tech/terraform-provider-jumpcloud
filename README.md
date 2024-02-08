@@ -44,10 +44,20 @@ Navigate to the test directory and check the plan. If the plan is successful, th
 cd ./examples/jumpcloud/confirm_install && terraform plan
 ```
 ## Using the provider
-
 See [examples](examples) for usage and consult [Spotnana Security & Trust](https://spotnana.slack.com/archives/C03SV2FGLN7) team for help
+
+While using local build of the provider, compact warnings to avoid long warnings in the output
+```shell
+export TF_CLI_ARGS_plan="-compact-warnings"
+export TF_CLI_ARGS_apply="-compact-warnings"
+```
+Set the required environment variables
+```shell
+export TF_VAR_api_key=<<YOUR_JUMPCLOUD_API_KEY>>
+```
+
+
 ```terraform
-# Initialize the provider
 terraform {
   required_providers {
     snjumpcloud = {
@@ -67,35 +77,22 @@ provider "snjumpcloud" {
 # Pulls all usergroups from the JumpCloud API
 data "snjumpcloud_usergroups" "all_usergroups" {}
 
-# Define some local variables, filter group results
 locals {
-  # The ID of the first usergroup
-  first_usergroup_id = data.snjumpcloud_usergroups.all_usergroups.usergroups.0.id
-  
   # filter the usergroups to only include those that start with "test"
   test_groups = [
     for g in data.snjumpcloud_usergroups.all_usergroups.usergroups : g.id
     if startswith(g.name, "test")
   ]
 }
-# Makes a new usergroup
+
 resource "snjumpcloud_usergroup" "example_group" {
   name        = "example-terraform-group"
   description = "This group was created by Spotnana Terraform Provider!"
 }
 
-# Output these values to the console
 output "group_id" {
   value = snjumpcloud_usergroup.example_group.id
   description = "The ID of the created group"
-}
-output "first_group_id" {
-  value = local.first_usergroup_id
-  description = "The ID of the first group"
-}
-output "test_groups" {
-  value = local.test_groups
-  description = "The IDs of all groups that start with 'test'"
 }
 ```
 See the [examples](examples/jumpcloud) for more provider usage examples.

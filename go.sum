@@ -13,6 +13,8 @@ github.com/ProtonMail/go-crypto v0.0.0-20230828082145-3c4c8a2d2371 h1:kkhsdkhsCv
 github.com/ProtonMail/go-crypto v0.0.0-20230828082145-3c4c8a2d2371/go.mod h1:EjAoLdwvbIOoOQr3ihjnSoLZRtE8azugULFRteWMNc0=
 github.com/Spotnana-Tech/sec-jumpcloud-client-go v0.1.2-0.20240129231127-3afdb06442ed h1:wN/Q5G9jIoWENVT0smRw1aqp6lD00Z+bMB/IGUatZNU=
 github.com/Spotnana-Tech/sec-jumpcloud-client-go v0.1.2-0.20240129231127-3afdb06442ed/go.mod h1:FITFevtvgtUboJQUzh+N/okRQa9p3eZjQHyufDkMxvY=
+github.com/Spotnana-Tech/sec-jumpcloud-client-go v0.1.3-0.20240206224737-6fc4137242b8 h1:IDA/j8qA8+zVMvRzkNR7Pm4owilq7PUIiQXm6CgVjWw=
+github.com/Spotnana-Tech/sec-jumpcloud-client-go v0.1.3-0.20240206224737-6fc4137242b8/go.mod h1:FITFevtvgtUboJQUzh+N/okRQa9p3eZjQHyufDkMxvY=
 github.com/acomagu/bufpipe v1.0.4 h1:e3H4WUzM3npvo5uv95QuJM3cQspFNtFBzvJ2oNjKIDQ=
 github.com/acomagu/bufpipe v1.0.4/go.mod h1:mxdxdup/WdsKVreO5GpW4+M/1CE2sMG4jeGJ2sYmHc4=
 github.com/agext/levenshtein v1.2.2 h1:0S/Yg6LYmFJ5stwQeRp6EeOcCbj7xiqQSdNelsXvaqE=

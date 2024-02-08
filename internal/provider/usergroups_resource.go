@@ -7,7 +7,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -31,12 +30,12 @@ type jcUserGroupsResource struct {
 
 // UserGroupResourceModel is the local model for this resource type.
 type UserGroupResourceModel struct {
-	ID          types.String `tfsdk:"id"`
-	Name        types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	Type        types.String `tfsdk:"type"`
-	Email       types.String `tfsdk:"email"`
-	//MemberQuery types.Map    `tfsdk:"member_query"`
+	ID               types.String `tfsdk:"id"`
+	Name             types.String `tfsdk:"name"`
+	Description      types.String `tfsdk:"description"`
+	Type             types.String `tfsdk:"type"`
+	Email            types.String `tfsdk:"email"`
+	MembershipMethod types.String `tfsdk:"membership_method"`
 }
 
 // Metadata returns the resource type name.
@@ -53,57 +52,26 @@ func (r *jcUserGroupsResource) Schema(_ context.Context, _ resource.SchemaReques
 				Computed: true,
 			},
 			"name": schema.StringAttribute{
-				Required: true,
+				Optional: true,
+				Computed: true,
 			},
 			"description": schema.StringAttribute{
-				MarkdownDescription: "User Group Description",
-				Optional:            true,
-				Computed:            true,
-				Default:             stringdefault.StaticString("UserGroup Managed by Terraform Provider snjumpcloud"),
+				Description: "User Group Description",
+				Optional:    true,
+				Computed:    true,
 			},
 			"type": schema.StringAttribute{
-				Computed: true,
+				Description: "ex. user_group or device_group type",
+				Computed:    true,
 			},
 			"email": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
-				Default:  stringdefault.StaticString(""),
+				Description: "User group email address",
+				Computed:    true,
 			},
-			//"membership_method": schema.StringAttribute{
-			//	Computed: true,
-			//	Optional: true,
-			//},
-			//"member_suggestions_notify": schema.BoolAttribute{
-			//	Computed: true,
-			//},
-			// This is the greatest nested schema!
-			//"member_query": schema.MapNestedAttribute{
-			//	Computed: true,
-			//	NestedObject: schema.NestedAttributeObject{
-			//		Attributes: map[string]schema.Attribute{
-			//			"query_type": schema.StringAttribute{
-			//				Computed: true,
-			//			},
-			//			"filters": schema.ListNestedAttribute{
-			//				Computed: true,
-			//				Optional: true,
-			//				NestedObject: schema.NestedAttributeObject{
-			//					Attributes: map[string]schema.Attribute{
-			//						"field": schema.StringAttribute{
-			//							Computed: true,
-			//						},
-			//						"operator": schema.StringAttribute{
-			//							Computed: true,
-			//						},
-			//						"value": schema.StringAttribute{
-			//							Computed: true,
-			//						},
-			//					},
-			//				},
-			//			},
-			//		},
-			//	},
-			//},
+			"membership_method": schema.StringAttribute{
+				Description: "Can be STATIC or DYNAMIC_AUTOMATED or DYNAMIC_REVIEW_REQUIRED",
+				Computed:    true,
+			},
 		},
 	}
 }
@@ -117,15 +85,15 @@ func (r *jcUserGroupsResource) Create(ctx context.Context, req resource.CreateRe
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
 	// Cast local model to client model
 	group := jcclient.UserGroup{
 		Name:        plan.Name.ValueString(),
 		Description: plan.Description.ValueString(),
-		Type:        plan.Type.ValueString(),
-		Email:       plan.Email.ValueString(),
 	}
-	// Create new group
-	newGroup, err := r.client.CreateUserGroup(group)
+
+	// Create new group, check for errors
+	g, err := r.client.CreateUserGroup(group)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating group",
@@ -133,16 +101,20 @@ func (r *jcUserGroupsResource) Create(ctx context.Context, req resource.CreateRe
 		)
 		return
 	}
-	tflog.Info(ctx, fmt.Sprintf("Created Jumpcloud User Group: %s", newGroup.Name))
+	tflog.Info(ctx, fmt.Sprintf("Created Jumpcloud User Group: %s", g.Name))
 
+	// Get the newly created group
+	newGroup, _ := r.client.GetUserGroup(g.ID)
 	// Map response body to schema and populate Computed attribute values
 	plan = UserGroupResourceModel{
-		ID:          types.StringValue(newGroup.ID),
-		Description: types.StringValue(newGroup.Description),
-		Name:        types.StringValue(newGroup.Name),
-		Email:       types.StringValue(newGroup.Email),
-		Type:        types.StringValue(newGroup.Type),
+		ID:               types.StringValue(newGroup.ID),
+		Description:      types.StringValue(newGroup.Description),
+		Name:             types.StringValue(newGroup.Name),
+		Email:            types.StringValue(newGroup.Email),
+		Type:             types.StringValue(newGroup.Type),
+		MembershipMethod: types.StringValue(newGroup.MembershipMethod),
 	}
+
 	// Set state to fully populated data
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
@@ -153,16 +125,17 @@ func (r *jcUserGroupsResource) Create(ctx context.Context, req resource.CreateRe
 
 // Read refreshes the Terraform state with the latest data.
 func (r *jcUserGroupsResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+	// Retrieve values from state
 	var state UserGroupResourceModel
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
 	// Get refreshed group value from jcclient
 	tflog.Info(ctx, fmt.Sprintf("Looking Up Group ID: %s", state.ID.ValueString()))
 	group, err := r.client.GetUserGroup(state.ID.ValueString())
-
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Reading Jumpcloud Group",
@@ -173,11 +146,12 @@ func (r *jcUserGroupsResource) Read(ctx context.Context, req resource.ReadReques
 
 	// Overwrite items with refreshed state
 	state = UserGroupResourceModel{
-		Description: types.StringValue(group.Description),
-		ID:          types.StringValue(group.ID),
-		Name:        types.StringValue(group.Name),
-		Email:       types.StringValue(group.Email),
-		Type:        types.StringValue(group.Type),
+		ID:               types.StringValue(group.ID),
+		Name:             types.StringValue(group.Name),
+		Description:      types.StringValue(group.Description),
+		Type:             types.StringValue(group.Type),
+		Email:            types.StringValue(group.Email),
+		MembershipMethod: types.StringValue(group.MembershipMethod),
 	}
 
 	// Set refreshed state
@@ -192,14 +166,12 @@ func (r *jcUserGroupsResource) Read(ctx context.Context, req resource.ReadReques
 func (r *jcUserGroupsResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Retrieve values from plan and state
 	var plan, state UserGroupResourceModel
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
-	diags = req.State.Get(ctx, &state)
+	diags := req.Plan.Get(ctx, &plan)  // plan
+	diags = req.State.Get(ctx, &state) // existing resource state as defined in the terraform state file
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	tflog.Info(ctx, fmt.Sprintf("STATE ID: %s", state.ID.ValueString()))
 
 	// Cast local model to client model
 	groupModification := jcclient.UserGroup{
@@ -216,17 +188,22 @@ func (r *jcUserGroupsResource) Update(ctx context.Context, req resource.UpdateRe
 		)
 		return
 	}
-	tflog.Info(ctx, fmt.Sprintf("Group Name: %s", group.Name))
-	tflog.Info(ctx, fmt.Sprintf("Group Desc: %s", group.Description))
-	tflog.Info(ctx, fmt.Sprintf("Group ID: %s", group.ID))
 
+	// Get the updated group
+	groupstate, err := r.client.GetUserGroup(state.ID.ValueString())
+	tflog.Info(ctx, fmt.Sprintf("Group Name: %s Group ID: %s", group.Name, group.ID))
+
+	// Map response body to schema and populate Computed attribute values
 	plan = UserGroupResourceModel{
-		Description: types.StringValue(group.Description),
-		ID:          types.StringValue(group.ID),
-		Name:        types.StringValue(group.Name),
-		Email:       types.StringValue(state.Email.ValueString()),
+		ID:               types.StringValue(groupstate.ID),
+		Name:             types.StringValue(groupstate.Name),
+		Description:      types.StringValue(groupstate.Description),
+		Type:             types.StringValue(groupstate.Type),
+		Email:            types.StringValue(groupstate.Email),
+		MembershipMethod: types.StringValue(groupstate.MembershipMethod),
 	}
 
+	// Set state to fully populated data
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -236,15 +213,15 @@ func (r *jcUserGroupsResource) Update(ctx context.Context, req resource.UpdateRe
 
 // Delete deletes the resource and removes the Terraform state on success.
 func (r *jcUserGroupsResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	// Retrieve values from state
 	var state UserGroupResourceModel
 	diags := req.State.Get(ctx, &state)
-	tflog.Info(ctx, fmt.Sprintf("STATE: %s", state.ID.ValueString()))
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	// Delete existing group
+	// Delete existing group. This object will be purged from the state file so there is no need to return values
 	err := r.client.DeleteUserGroup(state.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -261,21 +238,20 @@ func (r *jcUserGroupsResource) Configure(_ context.Context, req resource.Configu
 		return
 	}
 
-	// This is where we import our client for this type of resource!
+	// This is where we import our client for this type of resource
 	client, ok := req.ProviderData.(*jcclient.Client)
-
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Data Source Configure Type",
 			fmt.Sprintf("Expected *jcclient.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
-
 		return
 	}
 
 	r.client = client
 }
 
+// ImportState imports the resource state from live resources via their ID attribute
 func (r *jcUserGroupsResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// Retrieve import ID and save to id attribute
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)

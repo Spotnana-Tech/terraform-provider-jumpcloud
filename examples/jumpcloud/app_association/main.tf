@@ -41,8 +41,3 @@ resource "snjumpcloud_app_association" "test_app" {
     snjumpcloud_usergroup.group3.id
   ]
 }
-
-output "app_details" {
-  value       = snjumpcloud_app_association.test_app
-  description = "The details of the test app"
-}
