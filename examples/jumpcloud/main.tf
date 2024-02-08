@@ -18,7 +18,7 @@ data "snjumpcloud_usergroups" "all_usergroups" {}
 
 # Create a new usergroup
 resource "snjumpcloud_usergroup" "new_usergroup" {
-  name = "new_usergroup"
+  name        = "new_usergroup"
   description = "This is a new usergroup"
 }
 
