@@ -19,5 +19,18 @@ data "snjumpcloud_usergroups" "all_usergroups" {}
 # Create a new usergroup
 resource "snjumpcloud_usergroup" "new_usergroup" {
   name = "new_usergroup"
+  description = "This is a new usergroup"
+}
 
+# Importing the app association via applicationID
+import {
+  to = snjumpcloud_app_association.test_app
+  id = "65bc1fdaf6fc2af5f541a4c3"
+}
+
+# Associate the user groups with the app
+resource "snjumpcloud_app_association" "test_app" {
+  associated_groups = [
+    snjumpcloud_usergroup.new_usergroup.id
+  ]
 }
