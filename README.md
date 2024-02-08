@@ -98,29 +98,19 @@ output "group_id" {
 See the [examples](examples/jumpcloud) for more provider usage examples.
 
 
-## Import existing resources
-To simply manage the state of a resource, import it via the CLI
-```shell
-terraform import snjumpcloud_app_association.test_app <<EXAMPLE_APP_ID>>
-```
-Or import resources in your Terraform configuration file
-```terraform
-# Importing the app association via applicationID
-import {
-  to = snjumpcloud_app_association.test_app
-  id = "65bc1fdaf6fc2af5f541a4c3" # The ID of the app association
-}
+## Import existing resources via 
 
-# Associate the user groups with the app
-resource "snjumpcloud_app_association" "test_app" {
-  associated_groups = [
-    snjumpcloud_usergroup.group1.id,
-    snjumpcloud_usergroup.group2.id,
-    snjumpcloud_usergroup.group3.id
-  ]
+Add an import block to the Terraform configuration file for the resource you want to import.
+```terraform
+import {
+  to = snjumpcloud_app_association.example_app
+  id = "6abcd1230987654321" # The `app_id` of the application in Jumpcloud
 }
 ```
-See the [examples](examples/jumpcloud) for more provider import examples.
+Generate a .tf file for the resource you want to import.
+```shell
+terraform plan -generate-config-out="generated.tf"
+```
 
 ## Get support
 If you need help with this provider, please reach out to the [Spotnana Security & Trust](https://spotnana.slack.com/archives/C03SV2FGLN7) team.
