@@ -10,7 +10,7 @@ variable "api_key" {
   sensitive = true
 }
 provider "snjumpcloud" {
-  apikey = var.api_key
+  api_key = var.api_key
 }
 
 # Create a few user groups
@@ -29,12 +29,12 @@ resource "snjumpcloud_usergroup" "group3" {
 
 # Importing the app association via applicationID
 import {
-  to = snjumpcloud_app_association.test_app
+  to = snjumpcloud_app.test_app
   id = "65bc1fdaf6fc2af5f541a4c3"
 }
 
 # Associate the user groups with the app
-resource "snjumpcloud_app_association" "test_app" {
+resource "snjumpcloud_app" "test_app" {
   associated_groups = [
     snjumpcloud_usergroup.group1.id,
     snjumpcloud_usergroup.group2.id,

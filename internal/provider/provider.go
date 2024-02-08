@@ -44,14 +44,14 @@ func (p *jumpcloudProvider) Metadata(_ context.Context, _ provider.MetadataReque
 
 // jumpcloudProviderModel maps provider schema data to a Go type.
 type jumpcloudProviderModel struct {
-	ApiKey types.String `tfsdk:"apikey"`
+	ApiKey types.String `tfsdk:"api_key"`
 }
 
 // Schema defines the provider-level schema for configuration data.
 func (p *jumpcloudProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"apikey": schema.StringAttribute{
+			"api_key": schema.StringAttribute{
 				Required: true,
 			},
 		},
@@ -79,7 +79,7 @@ func (p *jumpcloudProvider) Configure(ctx context.Context, req provider.Configur
 
 	if config.ApiKey.IsUnknown() {
 		resp.Diagnostics.AddAttributeError(
-			path.Root("apikey"),
+			path.Root("api_key"),
 			"Missing JumpCloud API Key",
 			"The provider cannot create the JumpCloud API client as there is an unknown configuration value for the JumpCloud API host. "+
 				"Either target apply the source of the value first, set the value statically in the configuration, or use the JC_API_KEY environment variable.",
@@ -95,7 +95,7 @@ func (p *jumpcloudProvider) Configure(ctx context.Context, req provider.Configur
 
 	if apiKey == "" {
 		resp.Diagnostics.AddAttributeError(
-			path.Root("apikey"),
+			path.Root("api_key"),
 			"Missing JumpCloud API Key",
 			"The provider cannot create the JumpCloud API client as there is an unknown configuration value for the JumpCloud API host. "+
 				"Either target apply the source of the value first, set the value statically in the configuration, or use the JC_API_KEY environment variable."+
@@ -146,6 +146,6 @@ func (p *jumpcloudProvider) DataSources(_ context.Context) []func() datasource.D
 func (p *jumpcloudProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewUserGroupsResource,
-		NewAppAssociationResource,
+		NewAppResource,
 	}
 }

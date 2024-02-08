@@ -15,24 +15,24 @@ import (
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
-	_ resource.Resource                = &jcAppAssociationResource{}
-	_ resource.ResourceWithConfigure   = &jcAppAssociationResource{}
-	_ resource.ResourceWithImportState = &jcAppAssociationResource{}
+	_ resource.Resource                = &jcAppResource{}
+	_ resource.ResourceWithConfigure   = &jcAppResource{}
+	_ resource.ResourceWithImportState = &jcAppResource{}
 )
 
-// NewAppAssociationResource is a helper function to simplify the provider implementation.
-func NewAppAssociationResource() resource.Resource {
-	return &jcAppAssociationResource{}
+// NewAppResource is a helper function to simplify the provider implementation.
+func NewAppResource() resource.Resource {
+	return &jcAppResource{}
 }
 
-// jcAppAssociationResource is the resource implementation.
-type jcAppAssociationResource struct {
+// jcAppResource is the resource implementation.
+type jcAppResource struct {
 	client *jcclient.Client
 }
 
-// AppAssociationSchemaModel is the local model for this resource type.
-type AppAssociationSchemaModel struct {
-	ID               types.String `tfsdk:"app_id"`
+// AppSchemaModel is the local model for this resource type.
+type AppSchemaModel struct {
+	ID               types.String `tfsdk:"id"`
 	Name             types.String `tfsdk:"name"`
 	DisplayName      types.String `tfsdk:"display_name"`
 	DisplayLabel     types.String `tfsdk:"display_label"`
@@ -40,16 +40,15 @@ type AppAssociationSchemaModel struct {
 }
 
 // Metadata returns the resource type name.
-func (r *jcAppAssociationResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_app_association"
+func (r *jcAppResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_app"
 }
 
 // Schema defines the schema for the resource.
-func (r *jcAppAssociationResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *jcAppResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"app_id": schema.StringAttribute{
-				Optional: true,
+			"id": schema.StringAttribute{
 				Computed: true,
 			},
 			"name": schema.StringAttribute{
@@ -76,14 +75,14 @@ func (r *jcAppAssociationResource) Schema(_ context.Context, _ resource.SchemaRe
 }
 
 // Create creates the resource and sets the initial Terraform state.
-func (r *jcAppAssociationResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *jcAppResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// We should not be Creating or Deleting Apps via TF provider... yet
 }
 
 // Read refreshes the Terraform state with the latest data.
-func (r *jcAppAssociationResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *jcAppResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get the current state
-	var state AppAssociationSchemaModel
+	var state AppSchemaModel
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -119,7 +118,7 @@ func (r *jcAppAssociationResource) Read(ctx context.Context, req resource.ReadRe
 	}
 
 	// Overwrite items with refreshed state
-	state = AppAssociationSchemaModel{
+	state = AppSchemaModel{
 		ID:               types.StringValue(app.ID),
 		Name:             types.StringValue(app.Name),
 		DisplayName:      types.StringValue(app.DisplayName),
@@ -136,9 +135,9 @@ func (r *jcAppAssociationResource) Read(ctx context.Context, req resource.ReadRe
 }
 
 // Update updates the resource and sets the updated Terraform state on success.
-func (r *jcAppAssociationResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *jcAppResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Retrieve values from plan and state
-	var plan, state AppAssociationSchemaModel
+	var plan, state AppSchemaModel
 	diags := req.State.Get(ctx, &state)
 	diags = req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -221,7 +220,7 @@ func (r *jcAppAssociationResource) Update(ctx context.Context, req resource.Upda
 	}
 
 	// Overwrite items with refreshed state
-	state = AppAssociationSchemaModel{
+	state = AppSchemaModel{
 		ID:               types.StringValue(state.ID.ValueString()),
 		Name:             types.StringValue(state.Name.ValueString()),
 		DisplayName:      types.StringValue(state.DisplayName.ValueString()),
@@ -239,13 +238,13 @@ func (r *jcAppAssociationResource) Update(ctx context.Context, req resource.Upda
 }
 
 // Delete deletes the resource and removes the Terraform state on success.
-func (r *jcAppAssociationResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+func (r *jcAppResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	// We should not be Creating or Deleting Apps via TF provider... yet
 	return
 }
 
 // Configure adds the provider configuration to the resource.
-func (r *jcAppAssociationResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *jcAppResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -265,7 +264,7 @@ func (r *jcAppAssociationResource) Configure(ctx context.Context, req resource.C
 }
 
 // ImportState imports the resource state from an existing resource.
-func (r *jcAppAssociationResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *jcAppResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// Retrieve import ID and save to id attribute
-	resource.ImportStatePassthroughID(ctx, path.Root("app_id"), req, resp)
+	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
