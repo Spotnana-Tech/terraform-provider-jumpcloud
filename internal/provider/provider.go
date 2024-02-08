@@ -10,7 +10,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"os"
 	"strings"
 )
 
@@ -69,10 +68,9 @@ func (p *jumpcloudProvider) Configure(ctx context.Context, req provider.Configur
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	// If practitioner provided a configuration value for any of the
-	// attributes, it must be a known value.
-	apiKey := os.Getenv("JC_API_KEY")
-	config.ApiKey = types.StringValue(apiKey)
+
+	// Set the API key from the configuration
+	var apiKey string
 	if !config.ApiKey.IsNull() {
 		apiKey = config.ApiKey.ValueString()
 	}
@@ -102,21 +100,20 @@ func (p *jumpcloudProvider) Configure(ctx context.Context, req provider.Configur
 				"If either is already set, ensure the value is not empty.",
 		)
 	}
-
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	// Set provider-level log fields
 	ctx = tflog.SetField(ctx, "jumpcloud_host", jcclient.HostURL)
 	ctx = tflog.SetField(ctx, "api_key", apiKey)
 	ctx = tflog.MaskFieldValuesWithFieldKeys(ctx, "api_key") // Mask the API key in the logs
-
 	tflog.Debug(ctx, "Creating Jumpcloud client")
+
 	// Create a new jumpcloudProvider client using the configuration values
-	// TODO: rename the main jumpcloud client to something more meaningful
-	// TODO: pass keys in to this client, instead of through instantiating
 	client, err := jcclient.NewClient(apiKey)
 
+	// If the client is not created, or the host is not the expected value, return an error
 	if err != nil || !strings.Contains(client.HostURL.String(), "console.jumpcloud.com") {
 		resp.Diagnostics.AddError(
 			"Unable to Create JumpCloud API Client",
@@ -128,7 +125,7 @@ func (p *jumpcloudProvider) Configure(ctx context.Context, req provider.Configur
 		return
 	}
 
-	// Make the JumpCloud  client available during DataSource and Resource
+	// Make the JumpCloud client available during DataSource and Resource
 	//type Configure methods.
 	resp.DataSourceData = client
 	resp.ResourceData = client
