@@ -10,5 +10,5 @@ variable "api_key" {
   sensitive = true
 }
 provider "snjumpcloud" {
-  apikey = var.api_key
+  api_key = var.api_key
 }
