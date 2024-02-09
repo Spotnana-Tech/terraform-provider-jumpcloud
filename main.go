@@ -10,7 +10,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 
-	"terraform-provider-snjumpcloud/internal/provider"
+	"github.com/Spotnana-Tech/terraform-provider-snjumpcloud/internal/provider"
 )
 
 // Run "go generate" to format example terraform files and generate the docs for the registry/website
@@ -26,7 +26,7 @@ import (
 var (
 	// these will be set by the goreleaser configuration
 	// to appropriate values for the compiled binary.
-	version string = "dev"
+	version string = "v1.0.1"
 
 	// goreleaser can pass other information to the main package, such as the specific commit
 	// https://goreleaser.com/cookbooks/using-main.version/
@@ -42,7 +42,7 @@ func main() {
 		// TODO: Update this string with the published name of your provider.
 		// NOTE: This is a placeholder name for local development of the provider.
 		// Change this to the name of your provider when publishing.
-		Address: "test.com/Spotnana-Tech/sec-terraform-provider-snjumpcloud",
+		Address: "github.com/Spotnana-Tech/sec-terraform-provider-snjumpcloud",
 		Debug:   debug,
 	}
 

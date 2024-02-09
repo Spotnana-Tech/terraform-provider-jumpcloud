@@ -27,7 +27,7 @@ cat > ~/.terraformrc <<EOF
 provider_installation {
 
   dev_overrides {
-     "test.com/Spotnana-Tech/snjumpcloud" = "$SN_GOPATH"  
+     "github.com/Spotnana-Tech/snjumpcloud" = "$SN_GOPATH"  
   }
 
   # For all other providers, install them directly from their origin provider

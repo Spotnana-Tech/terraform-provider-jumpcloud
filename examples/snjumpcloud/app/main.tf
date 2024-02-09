@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     snjumpcloud = {
-      source = "test.com/Spotnana-Tech/snjumpcloud"
+      source = "github.com/Spotnana-Tech/snjumpcloud"
     }
   }
 }
