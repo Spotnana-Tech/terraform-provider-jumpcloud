@@ -52,22 +52,28 @@ func (d *jcUserGroupDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"usergroups": schema.ListNestedAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "A list of Jumpcloud User Groups",
+				MarkdownDescription: "A list of Jumpcloud User Groups",
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:            true,
+							Description:         "The ID of the User Group",
+							MarkdownDescription: "The ID of the User Group",
 						},
 						"name": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:            true,
+							Description:         "The Name of the User Group",
+							MarkdownDescription: "The Name of the User Group",
 						},
 						"description": schema.StringAttribute{
 							Computed: true,
 						},
 						"type": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "Types can be user_group or system_group",
+							MarkdownDescription: "Types can be user_group or system_group",
 						},
 					},
 				},
