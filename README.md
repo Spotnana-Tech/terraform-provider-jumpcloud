@@ -6,7 +6,10 @@ A Terraform provider for managing Jumpcloud resources.
 - [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.0
 - [Go](https://golang.org/doc/install) >= 1.20
 
-## Building The Provider
+---
+
+# Getting Started
+## Installation
 Clone the repository locally
 ```shell
 git clone https://github.com/Spotnana-Tech/sec-terraform-provider-snjumpcloud.git
@@ -38,8 +41,8 @@ provider_installation {
 EOF
 ```
 
-## Testing the provider
-See [examples](examples) for usage and consult [Spotnana Security & Trust](https://spotnana.slack.com/archives/C03SV2FGLN7) team for help
+## Testing
+See [examples](examples/snjumpcloud) for usage and consult [Spotnana Security & Trust](https://spotnana.slack.com/archives/C03SV2FGLN7) team for help
 
 While using local build of the provider, compact warnings to avoid long warnings in the output
 ```shell
@@ -52,13 +55,14 @@ export TF_VAR_api_key=<<YOUR_JUMPCLOUD_API_KEY>>
 ```
 Navigate to the example directory and check the plan. If the plan is successful, the provider is installed correctly.
 ```shell
-cd ./examples/jumpcloud/confirm_install && terraform plan
+cd ./examples/snjumpcloud/confirm_install && terraform plan
 ```
+---
+# Usage
+### All Features Example
+See the [core example](examples/snjumpcloud/main.tf) to see all features executed in a single plan. Alternatively browse the [documentation](/docs) for a detailed list.
 
-See the [examples](examples/snjumpcloud) for more provider usage examples.
-
-
-## Import existing resources
+### Importing Existing Resources
 
 Add an import block to the Terraform configuration file for the resource you want to import.
 ```terraform
@@ -67,6 +71,7 @@ import {
   id = "6abcd1230987654321" # The `app_id` of the application in Jumpcloud
 }
 ```
+### Generate Configuration
 Generate a `.tf` file for the resource you want to import.
 ```shell
 terraform plan -generate-config-out="generated.tf"

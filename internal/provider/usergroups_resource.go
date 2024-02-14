@@ -49,28 +49,36 @@ func (r *jcUserGroupsResource) Schema(_ context.Context, _ resource.SchemaReques
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "User Group ID",
+				MarkdownDescription: "User Group ID",
 			},
 			"name": schema.StringAttribute{
-				Optional: true,
-				Computed: true,
+				Optional:            true,
+				Computed:            true,
+				Description:         "User Group Name",
+				MarkdownDescription: "User Group Name",
 			},
 			"description": schema.StringAttribute{
-				Description: "User Group Description",
-				Optional:    true,
-				Computed:    true,
+				Optional:            true,
+				Computed:            true,
+				Description:         "User Group Description",
+				MarkdownDescription: "User Group Description",
 			},
 			"type": schema.StringAttribute{
-				Description: "ex. user_group or device_group type",
-				Computed:    true,
+				Computed:            true,
+				Description:         "ex. user_group or device_group type",
+				MarkdownDescription: "ex. user_group or device_group type",
 			},
 			"email": schema.StringAttribute{
-				Description: "User group email address",
-				Computed:    true,
+				Computed:            true,
+				Description:         "User group email address",
+				MarkdownDescription: "User group email address",
 			},
 			"membership_method": schema.StringAttribute{
-				Description: "Can be STATIC or DYNAMIC_AUTOMATED or DYNAMIC_REVIEW_REQUIRED",
-				Computed:    true,
+				Computed:            true,
+				Description:         "Can be STATIC or DYNAMIC_AUTOMATED or DYNAMIC_REVIEW_REQUIRED",
+				MarkdownDescription: "Can be STATIC or DYNAMIC_AUTOMATED or DYNAMIC_REVIEW_REQUIRED",
 			},
 		},
 	}
