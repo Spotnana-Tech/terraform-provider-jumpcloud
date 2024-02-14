@@ -1,3 +1,6 @@
+#
+# This example covers all use cases for the snjumpcloud provider
+#
 terraform {
   required_providers {
     snjumpcloud = {
@@ -16,6 +19,9 @@ provider "snjumpcloud" {
 # Pulls all usergroups from the JumpCloud API
 data "snjumpcloud_usergroups" "all_usergroups" {}
 
+# Pulls all apps from the JumpCloud API
+data "snjumpcloud_apps" "all_apps" {}
+
 # Create a new usergroup
 resource "snjumpcloud_usergroup" "new_usergroup" {
   name        = "new_usergroup"
@@ -33,4 +39,12 @@ resource "snjumpcloud_app" "test_app" {
   associated_groups = [
     snjumpcloud_usergroup.new_usergroup.id
   ]
+}
+
+output "num_usergroups" {
+  value = length(data.snjumpcloud_usergroups.all_usergroups.usergroups)
+}
+
+output "num_apps" {
+  value = length(data.snjumpcloud_apps.all_apps.apps)
 }
