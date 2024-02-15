@@ -51,7 +51,9 @@ func (p *jumpcloudProvider) Schema(_ context.Context, _ provider.SchemaRequest, 
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"api_key": schema.StringAttribute{
-				Required: true,
+				Required:            true,
+				Description:         "The JumpCloud API key. This is a sensitive value and should be stored in environment variables, never in code.",
+				MarkdownDescription: "The JumpCloud API key. This is a sensitive value and should be stored in environment variables, never in code.",
 			},
 		},
 	}
@@ -136,6 +138,7 @@ func (p *jumpcloudProvider) Configure(ctx context.Context, req provider.Configur
 func (p *jumpcloudProvider) DataSources(_ context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		NewjcUserGroupDataSource,
+		NewjcAppsDataSource,
 	}
 }
 
