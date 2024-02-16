@@ -33,3 +33,12 @@ resource "snjumpcloud_usergroup" "example" {
 - `id` (String) User Group ID
 - `membership_method` (String) Can be STATIC or DYNAMIC_AUTOMATED or DYNAMIC_REVIEW_REQUIRED
 - `type` (String) ex. user_group or device_group type
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+# Order can be imported by specifying the usergroup `id` and `name` in the `terraform import` command.
+terraform import snjumpcloud_usergroup.example 64f8c031123131314ad6a7
+```
