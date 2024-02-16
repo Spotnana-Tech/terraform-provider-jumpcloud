@@ -20,5 +20,5 @@ resource "snjumpcloud_usergroup" "example_group" {
 }
 
 output "group_details" {
-  value       = snjumpcloud_usergroup.example_group
+  value = snjumpcloud_usergroup.example_group
 }
