@@ -3,7 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
-	jcclient "github.com/Spotnana-Tech/sec-jumpcloud-client-go"
+	"github.com/Spotnana-Tech/sec-jumpcloud-client-go"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -25,7 +25,7 @@ func NewUserGroupsResource() resource.Resource {
 
 // jcUserGroupsResource is the resource implementation.
 type jcUserGroupsResource struct {
-	client *jcclient.Client
+	client *jumpcloud.Client
 }
 
 // UserGroupResourceModel is the local model for this resource type.
@@ -95,7 +95,7 @@ func (r *jcUserGroupsResource) Create(ctx context.Context, req resource.CreateRe
 	}
 
 	// Cast local model to client model
-	group := jcclient.UserGroup{
+	group := jumpcloud.UserGroup{
 		Name:        plan.Name.ValueString(),
 		Description: plan.Description.ValueString(),
 	}
@@ -141,7 +141,7 @@ func (r *jcUserGroupsResource) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 
-	// Get refreshed group value from jcclient
+	// Get refreshed group value from the jumpcloud client
 	tflog.Info(ctx, fmt.Sprintf("Looking Up Group ID: %s", state.ID.ValueString()))
 	group, err := r.client.GetUserGroup(state.ID.ValueString())
 	if err != nil {
@@ -182,7 +182,7 @@ func (r *jcUserGroupsResource) Update(ctx context.Context, req resource.UpdateRe
 	}
 
 	// Cast local model to client model
-	groupModification := jcclient.UserGroup{
+	groupModification := jumpcloud.UserGroup{
 		Name:        plan.Name.ValueString(),
 		Description: plan.Description.ValueString(),
 	}
@@ -247,11 +247,11 @@ func (r *jcUserGroupsResource) Configure(_ context.Context, req resource.Configu
 	}
 
 	// This is where we import our client for this type of resource
-	client, ok := req.ProviderData.(*jcclient.Client)
+	client, ok := req.ProviderData.(*jumpcloud.Client)
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Data Source Configure Type",
-			fmt.Sprintf("Expected *jcclient.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *jumpcloud.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 		return
 	}

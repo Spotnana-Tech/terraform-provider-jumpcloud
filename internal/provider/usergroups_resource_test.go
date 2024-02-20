@@ -12,19 +12,19 @@ func TestAccDataSourceUserGroups_CreateGroup(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				// Create a new user group and verify that aspects of it are correct
-				Config: providerConfig + `resource "snjumpcloud_usergroup" "new_usergroup" {
+				Config: providerConfig + `resource "jumpcloud_usergroup" "new_usergroup" {
 											name        = "new_usergroup_terraform_test"
 											description = "This group made via terraform test"
 										}`,
 				// Compose multiple test checks to verify the resource
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("snjumpcloud_usergroup.new_usergroup",
+					resource.TestCheckResourceAttr("jumpcloud_usergroup.new_usergroup",
 						"name",
 						"new_usergroup_terraform_test"),
-					resource.TestCheckResourceAttr("snjumpcloud_usergroup.new_usergroup",
+					resource.TestCheckResourceAttr("jumpcloud_usergroup.new_usergroup",
 						"type",
 						"user_group"),
-					resource.TestCheckResourceAttr("snjumpcloud_usergroup.new_usergroup",
+					resource.TestCheckResourceAttr("jumpcloud_usergroup.new_usergroup",
 						"membership_method",
 						"STATIC"),
 				),

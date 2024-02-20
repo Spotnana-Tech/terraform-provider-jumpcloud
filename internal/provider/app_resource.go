@@ -3,7 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
-	jcclient "github.com/Spotnana-Tech/sec-jumpcloud-client-go"
+	"github.com/Spotnana-Tech/sec-jumpcloud-client-go"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -27,7 +27,7 @@ func NewAppResource() resource.Resource {
 
 // jcAppResource is the resource implementation.
 type jcAppResource struct {
-	client *jcclient.Client
+	client *jumpcloud.Client
 }
 
 // AppSchemaModel is the local model for this resource type.
@@ -250,12 +250,12 @@ func (r *jcAppResource) Configure(ctx context.Context, req resource.ConfigureReq
 	}
 
 	// This is where we import our client for this type of resource!
-	client, ok := req.ProviderData.(*jcclient.Client)
+	client, ok := req.ProviderData.(*jumpcloud.Client)
 
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Data Source Configure Type",
-			fmt.Sprintf("Expected *jcclient.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *jumpcloud.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 		return
 	}

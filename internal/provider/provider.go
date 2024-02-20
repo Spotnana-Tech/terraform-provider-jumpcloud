@@ -37,7 +37,7 @@ type jumpcloudProvider struct {
 
 // Metadata returns the provider type name.
 func (p *jumpcloudProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
-	resp.TypeName = "snjumpcloud"
+	resp.TypeName = "jumpcloud"
 	resp.Version = p.version
 }
 
@@ -81,8 +81,7 @@ func (p *jumpcloudProvider) Configure(ctx context.Context, req provider.Configur
 		resp.Diagnostics.AddAttributeError(
 			path.Root("api_key"),
 			"Missing JumpCloud API Key",
-			"The provider cannot create the JumpCloud API client as there is an unknown configuration value for the JumpCloud API host. "+
-				"Either target apply the source of the value first, set the value statically in the configuration, or use the JC_API_KEY environment variable.",
+			"The provider cannot create the JumpCloud API client as the required api_key has not been supplied. ",
 		)
 	}
 

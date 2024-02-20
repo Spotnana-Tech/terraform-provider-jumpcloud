@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 
-	jcclient "github.com/Spotnana-Tech/sec-jumpcloud-client-go"
+	"github.com/Spotnana-Tech/sec-jumpcloud-client-go"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -39,7 +39,7 @@ func NewjcUserGroupDataSource() datasource.DataSource {
 // jcUserGroupDataSource is the data source implementation.
 // This struct accepts a client pointer to the JumpCloud Go client so terraform can make its changes to the system
 type jcUserGroupDataSource struct {
-	client *jcclient.Client
+	client *jumpcloud.Client
 }
 
 // Metadata returns the data source type name.
@@ -123,7 +123,7 @@ func (d *jcUserGroupDataSource) Configure(_ context.Context, req datasource.Conf
 	}
 
 	// This is where we import our client for this type of data source
-	client, ok := req.ProviderData.(*jcclient.Client)
+	client, ok := req.ProviderData.(*jumpcloud.Client)
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Data Source Configure Type",

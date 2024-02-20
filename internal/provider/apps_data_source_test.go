@@ -12,11 +12,11 @@ func TestAccDataSourceApps_GetAllApps(t *testing.T) {
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				// Ensure that data source snjumpcloud_usergroups returns at least one user group
-				Config: providerConfig + `data "snjumpcloud_apps" "test" {}`,
+				// Ensure that data source jumpcloud_usergroups returns at least one user group
+				Config: providerConfig + `data "jumpcloud_apps" "test" {}`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
-						"data.snjumpcloud_apps.test",
+						"data.jumpcloud_apps.test",
 						"apps.#",
 						regexp.MustCompile(`^0*[1-9]\d*$`)), // regex for a positive integer
 				),

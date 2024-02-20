@@ -12,7 +12,7 @@ variable "api_key" {
   type      = string
   sensitive = true
 }
-provider "snjumpcloud" {
+provider "jumpcloud" {
   api_key = var.api_key
 }
 `
@@ -24,6 +24,6 @@ var (
 	// CLI command executed to create a provider server to which the CLI can
 	// reattach.
 	testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
-		"snjumpcloud": providerserver.NewProtocol6WithError(New("test")()),
+		"jumpcloud": providerserver.NewProtocol6WithError(New("test")()),
 	}
 )

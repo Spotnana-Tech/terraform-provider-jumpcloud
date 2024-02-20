@@ -1,4 +1,4 @@
-module github.com/Spotnana-Tech/terraform-provider-snjumpcloud
+module github.com/Spotnana-Tech/terraform-provider-jumpcloud
 
 go 1.21
 
