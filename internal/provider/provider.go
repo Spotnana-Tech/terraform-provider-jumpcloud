@@ -37,7 +37,7 @@ type jumpcloudProvider struct {
 
 // Metadata returns the provider type name.
 func (p *jumpcloudProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
-	resp.TypeName = "snjumpcloud"
+	resp.TypeName = "jumpcloud"
 	resp.Version = p.version
 }
 
@@ -82,8 +82,7 @@ func (p *jumpcloudProvider) Configure(ctx context.Context, req provider.Configur
 		resp.Diagnostics.AddAttributeError(
 			path.Root("api_key"),
 			"Missing JumpCloud API Key",
-			"The provider cannot create the JumpCloud API client as there is an unknown configuration value for the JumpCloud API host. "+
-				"Either target apply the source of the value first, set the value statically in the configuration, or use the JC_API_KEY environment variable.",
+			"The provider cannot create the JumpCloud API client as the required api_key has not been supplied. ",
 		)
 	}
 
@@ -108,13 +107,13 @@ func (p *jumpcloudProvider) Configure(ctx context.Context, req provider.Configur
 	}
 
 	// Set provider-level log fields
-	ctx = tflog.SetField(ctx, "jumpcloud_host", jcclient.HostURL)
+	ctx = tflog.SetField(ctx, "jumpcloud_host", jumpcloud.HostURL)
 	ctx = tflog.SetField(ctx, "api_key", apiKey)
 	ctx = tflog.MaskFieldValuesWithFieldKeys(ctx, "api_key") // Mask the API key in the logs
 	tflog.Debug(ctx, "Creating Jumpcloud client")
 
 	// Create a new jumpcloudProvider client using the configuration values
-	client, err := jcclient.NewClient(apiKey)
+	client, err := jumpcloud.NewClient(apiKey)
 
 	// If the client is not created, or the host is not the expected value, return an error
 	if err != nil || !strings.Contains(client.HostURL.String(), "console.jumpcloud.com") {

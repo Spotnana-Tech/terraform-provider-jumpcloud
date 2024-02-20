@@ -2,7 +2,7 @@
 A Terraform provider for managing Jumpcloud resources.
 
 ### Requirements
-- [Spotnana Jumpcloud Go Client](https://github.com/Spotnana-Tech/sec-jumpcloud-client-go) >= 0.0.2
+- [Spotnana Jumpcloud Go Client](https://github.com/Spotnana-Tech/sec-jumpcloud-client-go) >= 1.0.0
 - [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.0
 - [Go](https://golang.org/doc/install) >= 1.20
 
@@ -12,8 +12,8 @@ A Terraform provider for managing Jumpcloud resources.
 ## Installation
 Clone the repository locally
 ```shell
-git clone https://github.com/Spotnana-Tech/sec-terraform-provider-snjumpcloud.git
-cd sec-terraform-provider-snjumpcloud
+git clone https://github.com/Spotnana-Tech/terraform-provider-jumpcloud.git
+cd terraform-provider-jumpcloud
 ```
 Build the provider using the Go `install` command:
 
@@ -30,7 +30,7 @@ cat > ~/.terraformrc <<EOF
 provider_installation {
 
   dev_overrides {
-     "github.com/Spotnana-Tech/snjumpcloud" = "$SN_GOPATH"  
+     "Spotnana-Tech/jumpcloud" = "$SN_GOPATH"  
   }
 
   # For all other providers, install them directly from their origin provider
@@ -42,7 +42,7 @@ EOF
 ```
 
 ## Testing
-See [examples](examples/snjumpcloud) for usage and consult [Spotnana Security & Trust](https://spotnana.slack.com/archives/C03SV2FGLN7) team for help
+See [examples](examples/jumpcloud) for usage and consult [Spotnana Security & Trust](https://spotnana.slack.com/archives/C03SV2FGLN7) team for help
 
 While using local build of the provider, compact warnings to avoid long warnings in the output
 ```shell
@@ -55,19 +55,19 @@ export TF_VAR_api_key=<<YOUR_JUMPCLOUD_API_KEY>>
 ```
 Navigate to the example directory and check the plan. If the plan is successful, the provider is installed correctly.
 ```shell
-cd ./examples/snjumpcloud/confirm_install && terraform plan
+cd ./examples/jumpcloud/confirm_install && terraform plan
 ```
 ---
 # Usage
 ### All Features Example
-See the [core example](examples/snjumpcloud/main.tf) to see all features executed in a single plan. Alternatively browse the [documentation](/docs) for a detailed list.
+See the [core example](examples/jumpcloud/main.tf) to see all features executed in a single plan. Alternatively browse the [documentation](/docs) for a detailed list.
 
 ### Importing Existing Resources
 
 Add an import block to the Terraform configuration file for the resource you want to import.
 ```terraform
 import {
-  to = snjumpcloud_app.example_app
+  to = jumpcloud_app.example_app
   id = "6abcd1230987654321" # The `app_id` of the application in Jumpcloud
 }
 ```
