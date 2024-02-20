@@ -34,4 +34,4 @@ provider "jumpcloud" {
 
 ### Required
 
-- `api_key` (String) The JumpCloud API key. This is a sensitive value and should be stored in environment variables, never in code.
+- `api_key` (String, Sensitive) The JumpCloud API key. This is a sensitive value and should be stored in environment variables, never in code.

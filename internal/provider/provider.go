@@ -52,6 +52,7 @@ func (p *jumpcloudProvider) Schema(_ context.Context, _ provider.SchemaRequest, 
 		Attributes: map[string]schema.Attribute{
 			"api_key": schema.StringAttribute{
 				Required:            true,
+				Sensitive:           true,
 				Description:         "The JumpCloud API key. This is a sensitive value and should be stored in environment variables, never in code.",
 				MarkdownDescription: "The JumpCloud API key. This is a sensitive value and should be stored in environment variables, never in code.",
 			},
