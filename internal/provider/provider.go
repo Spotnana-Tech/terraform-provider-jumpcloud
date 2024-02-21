@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-// Ensure the implementation satisfies the expected interfaces...
+// Ensure the implementation satisfies the expected interfaces.
 var (
 	_ provider.Provider = &jumpcloudProvider{}
 )
