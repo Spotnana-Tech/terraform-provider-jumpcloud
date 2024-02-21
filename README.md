@@ -23,7 +23,7 @@ provider "jumpcloud" {
 }
 
 resource "jumpcloud_usergroup" "example_group" {
-  name        = "example"
+  name = "example"
 }
 ```
 # Usage
