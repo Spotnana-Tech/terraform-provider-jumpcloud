@@ -11,8 +11,6 @@ github.com/Microsoft/go-winio v0.6.1 h1:9/kr64B9VUZrLm5YYwbGtUJnMgqWVOdUAXu6Migc
 github.com/Microsoft/go-winio v0.6.1/go.mod h1:LRdKpFKfdobln8UmuiYcKPot9D2v6svN5+sAH+4kjUM=
 github.com/ProtonMail/go-crypto v0.0.0-20230828082145-3c4c8a2d2371 h1:kkhsdkhsCvIsutKu5zLMgWtgh9YxGCNAw8Ad8hjwfYg=
 github.com/ProtonMail/go-crypto v0.0.0-20230828082145-3c4c8a2d2371/go.mod h1:EjAoLdwvbIOoOQr3ihjnSoLZRtE8azugULFRteWMNc0=
-github.com/Spotnana-Tech/sec-jumpcloud-client-go v1.0.0 h1:mxueA1xZar9HKLUB0VqR77x/Ld0mSPhpJ2cmh15qGT0=
-github.com/Spotnana-Tech/sec-jumpcloud-client-go v1.0.0/go.mod h1:FITFevtvgtUboJQUzh+N/okRQa9p3eZjQHyufDkMxvY=
 github.com/Spotnana-Tech/sec-jumpcloud-client-go v1.0.1-0.20240220203141-25da6dedf698 h1:tz1wPJ2cWyvmHyHHgzzmev9C3DObZr/5OpwRKzVuyFw=
 github.com/Spotnana-Tech/sec-jumpcloud-client-go v1.0.1-0.20240220203141-25da6dedf698/go.mod h1:9iUtBe/vjsO9xmFmarSdTM9BiQv9cqlwDu7yJc+bsVo=
 github.com/acomagu/bufpipe v1.0.4 h1:e3H4WUzM3npvo5uv95QuJM3cQspFNtFBzvJ2oNjKIDQ=
