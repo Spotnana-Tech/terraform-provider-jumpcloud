@@ -5,7 +5,7 @@ _"Jumpcloud" is a trademark of Jumpcloud, Inc.
 "Terraform" is a trademark of HashiCorp, Inc.
 "Go" is a trademark of Google LLC or its affiliate ("Google") for its programming language (see https://go.dev/brand).
 These marks are used nominatively to indicate the nature and function of Spotnana's
-terraform provider, which is neither sponsored or endorsed by Jumpcloud, Inc., Hashicorp, Inc. or Google._
+Terraform provider, which is neither sponsored or endorsed by Jumpcloud, Inc., Hashicorp, Inc. or Google._
 
 ### Requirements
 - [Spotnana Jumpcloud Go Client](https://github.com/Spotnana-Tech/sec-jumpcloud-client-go) >= 1.0.0
