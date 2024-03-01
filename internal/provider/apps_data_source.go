@@ -29,7 +29,7 @@ type jcAppsModel struct {
 }
 
 // jcAppsDataSourceModel maps the data source schema data.
-// TODO: Update this struct value to types.ListType or types.SetType
+// TODO: Update this struct value to types.ListType or types.SetType if the data source returns a list or set of items.
 type jcAppsDataSourceModel struct {
 	Apps []jcAppsModel `tfsdk:"apps"`
 }
@@ -40,7 +40,7 @@ func NewjcAppsDataSource() datasource.DataSource {
 }
 
 // jcAppsDataSource is the data source implementation.
-// This struct accepts a client pointer to the JumpCloud Go client so terraform can make its changes to the system
+// This struct accepts a client pointer to the JumpCloud Go client so terraform can make its changes to the system.
 type jcAppsDataSource struct {
 	client *jumpcloud.Client
 }

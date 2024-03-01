@@ -259,7 +259,7 @@ func (r *jcUserGroupsResource) Configure(_ context.Context, req resource.Configu
 	r.client = client
 }
 
-// ImportState imports the resource state from live resources via their ID attribute
+// ImportState imports the resource state from live resources via their ID attribute.
 func (r *jcUserGroupsResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// Retrieve import ID and save to id attribute
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)

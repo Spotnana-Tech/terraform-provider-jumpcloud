@@ -26,7 +26,7 @@ type jcUserGroupsModel struct {
 }
 
 // jcUserGroupsDataSourceModel maps the data source schema data.
-// TODO: Update this struct value to types.ListType or types.SetType
+// TODO: Update this struct value to types.ListType or types.SetType if the data source returns a list or set of items.
 type jcUserGroupsDataSourceModel struct {
 	UserGroups []jcUserGroupsModel `tfsdk:"usergroups"`
 }
@@ -37,7 +37,7 @@ func NewjcUserGroupDataSource() datasource.DataSource {
 }
 
 // jcUserGroupDataSource is the data source implementation.
-// This struct accepts a client pointer to the JumpCloud Go client so terraform can make its changes to the system
+// This struct accepts a client pointer to the JumpCloud Go client so terraform can make its changes to the system.
 type jcUserGroupDataSource struct {
 	client *jumpcloud.Client
 }
