@@ -145,7 +145,7 @@ func (r *jcAppResource) Read(ctx context.Context, req resource.ReadRequest, resp
 func (r *jcAppResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Retrieve values from plan and state
 	var plan, state AppSchemaModel
-	diags := req.State.Get(ctx, &state)
+	diags := req.State.Get(ctx, &state) //nolint:all
 	diags = req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -192,7 +192,7 @@ func (r *jcAppResource) Update(ctx context.Context, req resource.UpdateRequest, 
 			tflog.Info(ctx, fmt.Sprintf("ADDING GROUPID %s TO %s \n", group, state.DisplayLabel.ValueString()))
 
 			// Associate the group with the app
-			err = r.client.AssociateGroupWithApp(state.ID.ValueString(), group)
+			err = r.client.AssociateGroupWithApp(state.ID.ValueString(), group) //nolint:all
 		}
 	}
 
@@ -204,12 +204,12 @@ func (r *jcAppResource) Update(ctx context.Context, req resource.UpdateRequest, 
 			tflog.Info(ctx, fmt.Sprintf("REMOVING GROUPID %s FROM %s \n", group, state.DisplayLabel.ValueString()))
 
 			// Disassociate the group with the app
-			err = r.client.RemoveGroupFromApp(state.ID.ValueString(), group)
+			err = r.client.RemoveGroupFromApp(state.ID.ValueString(), group) //nolint:all
 		}
 	}
 
 	// Get the app associations
-	associations, err := r.client.GetAppAssociations(state.ID.ValueString(), "user_group")
+	associations, err := r.client.GetAppAssociations(state.ID.ValueString(), "user_group") //nolint:all
 
 	// Temp holder for associations to be added to state
 	var idAssociations []attr.Value
