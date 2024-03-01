@@ -8,7 +8,7 @@ These marks are used nominatively to indicate the nature and function of Spotnan
 Terraform provider, which is neither sponsored or endorsed by Jumpcloud, Inc., Hashicorp, Inc. or Google._
 
 ### Requirements
-- [Spotnana Jumpcloud Go Client](https://github.com/Spotnana-Tech/sec-jumpcloud-client-go) >= 1.0.0
+- [Spotnana Jumpcloud Go Client](https://github.com/Spotnana-Tech/sec-jumpcloud-client-go) >= 1.0.2
 - [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.0
 - [Go](https://golang.org/doc/install) >= 1.20
 
