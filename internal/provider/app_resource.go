@@ -92,6 +92,13 @@ func (r *jcAppResource) Read(ctx context.Context, req resource.ReadRequest, resp
 	// Get the app by ID
 	tflog.Info(ctx, fmt.Sprintf("Looking Up App ID: %s %s", state.ID.ValueString(), state.Name.ValueString()))
 	app, err := r.client.GetApplication(state.ID.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error Reading Jumpcloud App",
+			"Could not read Jumpcloud App ID "+state.ID.ValueString()+": "+err.Error(),
+		)
+		return
+	}
 	tflog.Info(ctx, fmt.Sprintf("Look Up Results: %s %s", app.ID, app.DisplayName))
 	// Get the app associations
 	associations, err := r.client.GetAppAssociations(state.ID.ValueString(), "user_group")
@@ -127,7 +134,7 @@ func (r *jcAppResource) Read(ctx context.Context, req resource.ReadRequest, resp
 	}
 
 	// Set refreshed state
-	diags = resp.State.Set(ctx, &state)
+	diags = resp.State.Set(ctx, &state) //nolint:all
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -170,8 +177,8 @@ func (r *jcAppResource) Update(ctx context.Context, req resource.UpdateRequest, 
 	// Turn oldstate and newstate into []string of group IDs - these are the associations of the app to usergroups
 	var oldElements []string
 	var newElements []string
-	diags = oldstate.ElementsAs(ctx, &oldElements, false)
-	diags = newstate.ElementsAs(ctx, &newElements, false)
+	diags = oldstate.ElementsAs(ctx, &oldElements, false) //nolint:all
+	diags = newstate.ElementsAs(ctx, &newElements, false) //nolint:all
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -240,7 +247,6 @@ func (r *jcAppResource) Update(ctx context.Context, req resource.UpdateRequest, 
 // Delete deletes the resource and removes the Terraform state on success.
 func (r *jcAppResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	// We should not be Creating or Deleting Apps via TF provider... yet
-	return
 }
 
 // Configure adds the provider configuration to the resource.
