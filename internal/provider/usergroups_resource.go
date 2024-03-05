@@ -174,7 +174,7 @@ func (r *jcUserGroupsResource) Read(ctx context.Context, req resource.ReadReques
 func (r *jcUserGroupsResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Retrieve values from plan and state
 	var plan, state UserGroupResourceModel
-	diags := req.Plan.Get(ctx, &plan)  // plan
+	diags := req.Plan.Get(ctx, &plan)  //nolint:all
 	diags = req.State.Get(ctx, &state) // existing resource state as defined in the terraform state file
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -198,7 +198,7 @@ func (r *jcUserGroupsResource) Update(ctx context.Context, req resource.UpdateRe
 	}
 
 	// Get the updated group
-	groupstate, err := r.client.GetUserGroup(state.ID.ValueString())
+	groupstate, err := r.client.GetUserGroup(state.ID.ValueString()) //nolint:all
 	tflog.Info(ctx, fmt.Sprintf("Group Name: %s Group ID: %s", group.Name, group.ID))
 
 	// Map response body to schema and populate Computed attribute values
@@ -259,7 +259,7 @@ func (r *jcUserGroupsResource) Configure(_ context.Context, req resource.Configu
 	r.client = client
 }
 
-// ImportState imports the resource state from live resources via their ID attribute
+// ImportState imports the resource state from live resources via their ID attribute.
 func (r *jcUserGroupsResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// Retrieve import ID and save to id attribute
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)

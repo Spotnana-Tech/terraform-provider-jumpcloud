@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	// providerConfig is a shared configuration to combine with the actual test configuration
+	// providerConfig is a shared configuration to combine with the actual test configuration.
 	providerConfig = `
 variable "api_key" {
   type      = string
