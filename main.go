@@ -39,11 +39,6 @@ func main() {
 	flag.Parse()
 
 	opts := providerserver.ServeOpts{
-		// TODO: Update this string with the published name of your provider.
-		// NOTE: This is a placeholder name for local development of the provider.
-		// Change this to the name of your provider when publishing.
-
-		//Address: "registry.terraform.io/Spotnana-Tech/jumpcloud",
 		Address: "github.com/Spotnana-Tech/terraform-provider-jumpcloud",
 		Debug:   debug,
 	}
