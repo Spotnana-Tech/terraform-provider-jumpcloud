@@ -26,7 +26,7 @@ import (
 var (
 	// these will be set by the goreleaser configuration
 	// to appropriate values for the compiled binary.
-	version string = "v1.0.5"
+	version string = "v1.0.6"
 
 	// goreleaser can pass other information to the main package, such as the specific commit
 	// https://goreleaser.com/cookbooks/using-main.version/
@@ -39,11 +39,6 @@ func main() {
 	flag.Parse()
 
 	opts := providerserver.ServeOpts{
-		// TODO: Update this string with the published name of your provider.
-		// NOTE: This is a placeholder name for local development of the provider.
-		// Change this to the name of your provider when publishing.
-
-		//Address: "registry.terraform.io/Spotnana-Tech/jumpcloud",
 		Address: "github.com/Spotnana-Tech/terraform-provider-jumpcloud",
 		Debug:   debug,
 	}

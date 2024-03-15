@@ -3,12 +3,14 @@ package provider
 import (
 	"context"
 	"fmt"
-	"github.com/Spotnana-Tech/sec-jumpcloud-client-go"
+	jumpcloud "github.com/Spotnana-Tech/sec-jumpcloud-client-go"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"slices"
 )
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -36,6 +38,7 @@ type UserGroupResourceModel struct {
 	Type             types.String `tfsdk:"type"`
 	Email            types.String `tfsdk:"email"`
 	MembershipMethod types.String `tfsdk:"membership_method"`
+	Members          types.Set    `tfsdk:"members"`
 }
 
 // Metadata returns the resource type name.
@@ -80,6 +83,13 @@ func (r *jcUserGroupsResource) Schema(_ context.Context, _ resource.SchemaReques
 				Description:         "Can be STATIC or DYNAMIC_AUTOMATED or DYNAMIC_REVIEW_REQUIRED",
 				MarkdownDescription: "Can be STATIC or DYNAMIC_AUTOMATED or DYNAMIC_REVIEW_REQUIRED",
 			},
+			"members": schema.SetAttribute{
+				Computed:            true,
+				Optional:            true,
+				Description:         "User emails associated with this group",
+				MarkdownDescription: "This is a set of user emails associated with this group.",
+				ElementType:         types.StringType,
+			},
 		},
 	}
 }
@@ -92,6 +102,18 @@ func (r *jcUserGroupsResource) Create(ctx context.Context, req resource.CreateRe
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
+	}
+
+	// Get the members emails from the plan
+	var planMemberEmails []string
+	memberUserEmailSet, _ := plan.Members.ToSetValue(ctx)
+	diags = memberUserEmailSet.ElementsAs(ctx, &planMemberEmails, false) //nolint:all
+
+	// Get the user ids from the emails
+	var memberUserIds []string
+	for _, member := range planMemberEmails {
+		userId, _ := r.client.GetUserIDFromEmail(member)
+		memberUserIds = append(memberUserIds, userId)
 	}
 
 	// Cast local model to client model
@@ -111,8 +133,29 @@ func (r *jcUserGroupsResource) Create(ctx context.Context, req resource.CreateRe
 	}
 	tflog.Info(ctx, fmt.Sprintf("Created Jumpcloud User Group: %s", g.Name))
 
+	// Add members
+	for _, userID := range memberUserIds {
+		ok, _ := r.client.AddUserToGroup(g.ID, userID)
+		if !ok {
+			resp.Diagnostics.AddError(
+				"Error adding user to group",
+				"Could not add user to group, unexpected error: "+err.Error(),
+			)
+			return
+		}
+	}
+
 	// Get the newly created group
 	newGroup, _ := r.client.GetUserGroup(g.ID)
+
+	// Get the members
+	var memberEmails []attr.Value // This is the terraform structure requirement
+	members, _ := r.client.GetGroupMembers(newGroup.ID)
+	for _, member := range members {
+		email, _ := r.client.GetUserEmailFromID(member.To.ID)
+		memberEmails = append(memberEmails, types.StringValue(email))
+	}
+	returnedMembers, _ := types.SetValue(types.StringType, memberEmails)
 	// Map response body to schema and populate Computed attribute values
 	plan = UserGroupResourceModel{
 		ID:               types.StringValue(newGroup.ID),
@@ -121,6 +164,7 @@ func (r *jcUserGroupsResource) Create(ctx context.Context, req resource.CreateRe
 		Email:            types.StringValue(newGroup.Email),
 		Type:             types.StringValue(newGroup.Type),
 		MembershipMethod: types.StringValue(newGroup.MembershipMethod),
+		Members:          returnedMembers,
 	}
 
 	// Set state to fully populated data
@@ -151,6 +195,14 @@ func (r *jcUserGroupsResource) Read(ctx context.Context, req resource.ReadReques
 		)
 		return
 	}
+	// Get the members
+	var memberEmails []attr.Value // This is the terraform structure requirement
+	members, _ := r.client.GetGroupMembers(state.ID.ValueString())
+	for _, member := range members {
+		email, _ := r.client.GetUserEmailFromID(member.To.ID)
+		memberEmails = append(memberEmails, types.StringValue(email))
+	}
+	returnedMembers, _ := types.SetValue(types.StringType, memberEmails)
 
 	// Overwrite items with refreshed state
 	state = UserGroupResourceModel{
@@ -160,6 +212,7 @@ func (r *jcUserGroupsResource) Read(ctx context.Context, req resource.ReadReques
 		Type:             types.StringValue(group.Type),
 		Email:            types.StringValue(group.Email),
 		MembershipMethod: types.StringValue(group.MembershipMethod),
+		Members:          returnedMembers,
 	}
 
 	// Set refreshed state
@@ -181,6 +234,16 @@ func (r *jcUserGroupsResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
+	// Isolate the members from the plan and state
+	stateMembers, _ := state.Members.ToSetValue(ctx)
+	plannedMembers, _ := plan.Members.ToSetValue(ctx)
+
+	// Turn them in to []string
+	var newMembers []string
+	plannedMembers.ElementsAs(ctx, &newMembers, false)
+	var oldMembers []string
+	stateMembers.ElementsAs(ctx, &oldMembers, false)
+
 	// Cast local model to client model
 	groupModification := jumpcloud.UserGroup{
 		Name:        plan.Name.ValueString(),
@@ -188,7 +251,7 @@ func (r *jcUserGroupsResource) Update(ctx context.Context, req resource.UpdateRe
 	}
 
 	// Update group, reference the state's group Id
-	group, err := r.client.UpdateUserGroup(state.ID.ValueString(), groupModification)
+	_, err := r.client.UpdateUserGroup(state.ID.ValueString(), groupModification)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Modifying Group",
@@ -197,18 +260,67 @@ func (r *jcUserGroupsResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
-	// Get the updated group
-	groupstate, err := r.client.GetUserGroup(state.ID.ValueString()) //nolint:all
-	tflog.Info(ctx, fmt.Sprintf("Group Name: %s Group ID: %s", group.Name, group.ID))
+	// Get current group membership
+	var currentMemberEmails []string
+	currentMembers, _ := r.client.GetGroupMembers(state.ID.ValueString())
+	for _, member := range currentMembers {
+		email, _ := r.client.GetUserEmailFromID(member.To.ID)
+		currentMemberEmails = append(currentMemberEmails, email)
+	}
 
+	// TODO if plan member not in current members, add to group
+	for _, member := range newMembers {
+		if !slices.Contains(currentMemberEmails, member) {
+			uid, _ := r.client.GetUserIDFromEmail(member)
+			ok, _ := r.client.AddUserToGroup(state.ID.ValueString(), uid)
+			if !ok {
+				resp.Diagnostics.AddError(
+					"Error Adding User to Group",
+					"Could not add user to group, unexpected error: "+err.Error(),
+				)
+				return
+			}
+		}
+	}
+
+	// TODO if current member not in plan members, remove from group
+	for _, member := range oldMembers {
+		if !slices.Contains(newMembers, member) {
+			// Remove member from group
+			uid, _ := r.client.GetUserIDFromEmail(member)
+			ok, _ := r.client.RemoveUserFromGroup(state.ID.ValueString(), uid)
+			if !ok {
+				resp.Diagnostics.AddError(
+					"Error Removing User from Group",
+					"Could not remove user from group, unexpected error: "+err.Error(),
+				)
+				return
+			}
+		}
+	}
+
+	// Get the updated group
+	groupState, err := r.client.GetUserGroup(state.ID.ValueString()) //nolint:all
+	tflog.Info(ctx, fmt.Sprintf("Group Name: %s Group ID: %s", groupState.Name, groupState.ID))
+
+	// Get the members
+	var updatedMemberEmails []attr.Value // This is the terraform structure requirement
+	updatedMembers, _ := r.client.GetGroupMembers(state.ID.ValueString())
+	// Iterate through the members and get their emails
+	for _, member := range updatedMembers {
+		email, _ := r.client.GetUserEmailFromID(member.To.ID)
+		updatedMemberEmails = append(updatedMemberEmails, types.StringValue(email))
+	}
+	finalMembers, _ := types.SetValue(types.StringType, updatedMemberEmails)
 	// Map response body to schema and populate Computed attribute values
 	plan = UserGroupResourceModel{
-		ID:               types.StringValue(groupstate.ID),
-		Name:             types.StringValue(groupstate.Name),
-		Description:      types.StringValue(groupstate.Description),
-		Type:             types.StringValue(groupstate.Type),
-		Email:            types.StringValue(groupstate.Email),
-		MembershipMethod: types.StringValue(groupstate.MembershipMethod),
+		ID:               types.StringValue(groupState.ID),
+		Name:             types.StringValue(groupState.Name),
+		Description:      types.StringValue(groupState.Description),
+		Type:             types.StringValue(groupState.Type),
+		Email:            types.StringValue(groupState.Email),
+		MembershipMethod: types.StringValue(groupState.MembershipMethod),
+		Members:          finalMembers,
 	}
 
 	// Set state to fully populated data

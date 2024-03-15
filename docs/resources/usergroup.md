@@ -16,6 +16,10 @@ description: |-
 resource "jumpcloud_usergroup" "example" {
   name        = "example-name"
   description = "example description"
+  members = [
+    "example-member-1",
+    "example-member-2",
+  ]
 }
 ```
 
@@ -25,6 +29,7 @@ resource "jumpcloud_usergroup" "example" {
 ### Optional
 
 - `description` (String) User Group Description
+- `members` (Set of String) This is a set of user emails associated with this group.
 - `name` (String) User Group Name
 
 ### Read-Only
@@ -39,6 +44,6 @@ resource "jumpcloud_usergroup" "example" {
 Import is supported using the following syntax:
 
 ```shell
-# Order can be imported by specifying the usergroup `id` and `name` in the `terraform import` command.
+# UserGroups can be imported by specifying the usergroup `id` and `name` in the `terraform import` command.
 terraform import snjumpcloud_usergroup.example 64f8c031123131314ad6a7
 ```
