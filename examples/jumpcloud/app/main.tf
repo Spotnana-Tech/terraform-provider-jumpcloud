@@ -17,14 +17,17 @@ provider "jumpcloud" {
 resource "jumpcloud_usergroup" "group1" {
   name        = "Test-Terraform-Group1"
   description = "This group was created by Spotnana Terraform Provider!"
+  members     = []
 }
 resource "jumpcloud_usergroup" "group2" {
   name        = "Test-Terraform-Group2"
   description = "This group was also created by Spotnana Terraform Provider!"
+  members     = []
 }
 resource "jumpcloud_usergroup" "group3" {
   name        = "Test-Terraform-Group3"
   description = "This group was the 3rd created by Spotnana Terraform Provider!"
+  members     = []
 }
 
 # Importing the app association via applicationID

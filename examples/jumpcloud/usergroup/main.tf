@@ -17,9 +17,7 @@ provider "jumpcloud" {
 resource "jumpcloud_usergroup" "example_group" {
   name        = "example-terraform-group"
   description = "This group was created by Spotnana Terraform Provider!"
-  members     = [
-    "kgibson@spotnana.com",
-    "bgodard@spotnana.com",]
+  members     = []
 }
 
 output "group_details" {

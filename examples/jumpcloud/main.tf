@@ -26,6 +26,7 @@ data "jumpcloud_apps" "all_apps" {}
 resource "jumpcloud_usergroup" "new_usergroup" {
   name        = "tf-provider-test-new_usergroup"
   description = "This is a new usergroup from the Terraform provider"
+  members     = []
 }
 
 # Importing the app association via applicationID

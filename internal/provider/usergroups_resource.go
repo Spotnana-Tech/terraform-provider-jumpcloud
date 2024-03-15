@@ -251,7 +251,7 @@ func (r *jcUserGroupsResource) Update(ctx context.Context, req resource.UpdateRe
 	}
 
 	// Update group, reference the state's group Id
-	group, err := r.client.UpdateUserGroup(state.ID.ValueString(), groupModification)
+	_, err := r.client.UpdateUserGroup(state.ID.ValueString(), groupModification)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Modifying Group",
@@ -260,11 +260,19 @@ func (r *jcUserGroupsResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
+	// Get current group membership
+	var currentMemberEmails []string
+	currentMembers, _ := r.client.GetGroupMembers(state.ID.ValueString())
+	for _, member := range currentMembers {
+		email, _ := r.client.GetUserEmailFromID(member.To.ID)
+		currentMemberEmails = append(currentMemberEmails, email)
+	}
+
 	// TODO if plan member not in current members, add to group
 	for _, member := range newMembers {
-		if !slices.Contains(currentMembers, member) {
-			// Add member to group
-			ok, _ := r.client.AddUserToGroup(state.ID.ValueString(), member)
+		if !slices.Contains(currentMemberEmails, member) {
+			uid, _ := r.client.GetUserIDFromEmail(member)
+			ok, _ := r.client.AddUserToGroup(state.ID.ValueString(), uid)
 			if !ok {
 				resp.Diagnostics.AddError(
 					"Error Adding User to Group",
@@ -273,13 +281,14 @@ func (r *jcUserGroupsResource) Update(ctx context.Context, req resource.UpdateRe
 				return
 			}
 		}
-
 	}
+
 	// TODO if current member not in plan members, remove from group
 	for _, member := range oldMembers {
 		if !slices.Contains(newMembers, member) {
 			// Remove member from group
-			ok, _ := r.client.RemoveUserFromGroup(state.ID.ValueString(), member)
+			uid, _ := r.client.GetUserIDFromEmail(member)
+			ok, _ := r.client.RemoveUserFromGroup(state.ID.ValueString(), uid)
 			if !ok {
 				resp.Diagnostics.AddError(
 					"Error Removing User from Group",
@@ -288,29 +297,29 @@ func (r *jcUserGroupsResource) Update(ctx context.Context, req resource.UpdateRe
 				return
 			}
 		}
-
 	}
+
 	// Get the updated group
-	groupstate, err := r.client.GetUserGroup(state.ID.ValueString()) //nolint:all
-	tflog.Info(ctx, fmt.Sprintf("Group Name: %s Group ID: %s", group.Name, group.ID))
+	groupState, err := r.client.GetUserGroup(state.ID.ValueString()) //nolint:all
+	tflog.Info(ctx, fmt.Sprintf("Group Name: %s Group ID: %s", groupState.Name, groupState.ID))
 
 	// Get the members
 	var updatedMemberEmails []attr.Value // This is the terraform structure requirement
 	updatedMembers, _ := r.client.GetGroupMembers(state.ID.ValueString())
+	// Iterate through the members and get their emails
 	for _, member := range updatedMembers {
 		email, _ := r.client.GetUserEmailFromID(member.To.ID)
-		tflog.Info(ctx, fmt.Sprintf("Member Email: %s", email))
 		updatedMemberEmails = append(updatedMemberEmails, types.StringValue(email))
 	}
 	finalMembers, _ := types.SetValue(types.StringType, updatedMemberEmails)
 	// Map response body to schema and populate Computed attribute values
 	plan = UserGroupResourceModel{
-		ID:               types.StringValue(groupstate.ID),
-		Name:             types.StringValue(groupstate.Name),
-		Description:      types.StringValue(groupstate.Description),
-		Type:             types.StringValue(groupstate.Type),
-		Email:            types.StringValue(groupstate.Email),
-		MembershipMethod: types.StringValue(groupstate.MembershipMethod),
+		ID:               types.StringValue(groupState.ID),
+		Name:             types.StringValue(groupState.Name),
+		Description:      types.StringValue(groupState.Description),
+		Type:             types.StringValue(groupState.Type),
+		Email:            types.StringValue(groupState.Email),
+		MembershipMethod: types.StringValue(groupState.MembershipMethod),
 		Members:          finalMembers,
 	}
 
