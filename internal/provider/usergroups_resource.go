@@ -87,7 +87,7 @@ func (r *jcUserGroupsResource) Schema(_ context.Context, _ resource.SchemaReques
 				Computed:            true,
 				Optional:            true,
 				Description:         "User IDs associated with this group",
-				MarkdownDescription: "This is a set of user IDs associated with this group.",
+				MarkdownDescription: "This is a set of user emails associated with this group.",
 				ElementType:         types.StringType,
 			},
 		},
