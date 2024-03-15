@@ -86,7 +86,7 @@ func (r *jcUserGroupsResource) Schema(_ context.Context, _ resource.SchemaReques
 			"members": schema.SetAttribute{
 				Computed:            true,
 				Optional:            true,
-				Description:         "User IDs associated with this group",
+				Description:         "User emails associated with this group",
 				MarkdownDescription: "This is a set of user emails associated with this group.",
 				ElementType:         types.StringType,
 			},
