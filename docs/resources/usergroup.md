@@ -29,7 +29,7 @@ resource "jumpcloud_usergroup" "example" {
 ### Optional
 
 - `description` (String) User Group Description
-- `members` (Set of String) This is a set of user IDs associated with this group.
+- `members` (Set of String) This is a set of user emails associated with this group.
 - `name` (String) User Group Name
 
 ### Read-Only
