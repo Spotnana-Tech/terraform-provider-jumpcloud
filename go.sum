@@ -16,6 +16,7 @@ github.com/Spotnana-Tech/sec-jumpcloud-client-go v1.0.4-0.20240318191421-d3910f0
 github.com/Spotnana-Tech/sec-jumpcloud-client-go v1.0.4-0.20240318191421-d3910f0a1bda/go.mod h1:9iUtBe/vjsO9xmFmarSdTM9BiQv9cqlwDu7yJc+bsVo=
 github.com/Spotnana-Tech/sec-jumpcloud-client-go v1.0.4-0.20240318201126-c808a5c26dc8 h1:e9kALMnG3lEJfAtiPdGpODbk5i3bjf8/U3Ifpvbe8cE=
 github.com/Spotnana-Tech/sec-jumpcloud-client-go v1.0.4-0.20240318201126-c808a5c26dc8/go.mod h1:9iUtBe/vjsO9xmFmarSdTM9BiQv9cqlwDu7yJc+bsVo=
+github.com/Spotnana-Tech/sec-jumpcloud-client-go v1.0.4-0.20240319010328-d110ddd05f3c h1:WHrGdXX2GCC0ZBKbzpry6gtwWU2+6F08uCbU6UlIpwQ=
 github.com/Spotnana-Tech/sec-jumpcloud-client-go v1.0.4-0.20240319010328-d110ddd05f3c/go.mod h1:9iUtBe/vjsO9xmFmarSdTM9BiQv9cqlwDu7yJc+bsVo=
 github.com/Spotnana-Tech/sec-jumpcloud-client-go v1.0.4 h1:VC86V57q2aMNg/lxl6Nsi7wz4BJjcoIq57nUbbage0Q=
 github.com/Spotnana-Tech/sec-jumpcloud-client-go v1.0.4/go.mod h1:9iUtBe/vjsO9xmFmarSdTM9BiQv9cqlwDu7yJc+bsVo=
