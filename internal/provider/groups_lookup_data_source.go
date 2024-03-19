@@ -14,12 +14,12 @@ import (
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
-	_ datasource.DataSource              = &jcUserGroupDataLookupSource{}
-	_ datasource.DataSourceWithConfigure = &jcUserGroupDataLookupSource{}
+	_ datasource.DataSource              = &jcGroupDataLookupSource{}
+	_ datasource.DataSourceWithConfigure = &jcGroupDataLookupSource{}
 )
 
-// jcUserGroupsLookupModel maps the provider schema data to a Go type.
-type jcUserGroupsLookupModel struct {
+// jcGroupsLookupModel maps the provider schema data to a Go type.
+type jcGroupsLookupModel struct {
 	ID          types.String `tfsdk:"id"`
 	Name        types.String `tfsdk:"name"`
 	Description types.String `tfsdk:"description"`
@@ -27,48 +27,48 @@ type jcUserGroupsLookupModel struct {
 	Members     types.Set    `tfsdk:"members"`
 }
 
-// jcUserGroupsDataSourceModel maps the data source schema data.
-type jcUserGroupsLookupDataSourceModel struct {
-	UserGroups []jcUserGroupsLookupModel `tfsdk:"groups"`
-	Name       types.String              `tfsdk:"name"`
-	Limit      types.Int64               `tfsdk:"limit"`
+// jcGroupsDataSourceModel maps the data source schema data.
+type jcGroupsLookupDataSourceModel struct {
+	Groups []jcGroupsLookupModel `tfsdk:"groups"`
+	Name   types.String          `tfsdk:"name"`
+	Limit  types.Int64           `tfsdk:"limit"`
 }
 
-// NewjcUserGroupLookupDataSource is a helper function to simplify the provider implementation.
-func NewjcUserGroupLookupDataSource() datasource.DataSource {
-	return &jcUserGroupDataLookupSource{}
+// NewjcGroupLookupDataSource is a helper function to simplify the provider implementation.
+func NewjcGroupLookupDataSource() datasource.DataSource {
+	return &jcGroupDataLookupSource{}
 }
 
-// jcUserGroupDataLookupSource is the data source implementation.
+// jcGroupDataLookupSource is the data source implementation.
 // This struct accepts a client pointer to the JumpCloud Go client so terraform can make its changes to the system.
-type jcUserGroupDataLookupSource struct {
+type jcGroupDataLookupSource struct {
 	client *jumpcloud.Client
 }
 
 // Metadata returns the data source type name.
-func (d *jcUserGroupDataLookupSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *jcGroupDataLookupSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_group_lookup"
 }
 
 // Schema defines the schema for the data source.
-func (d *jcUserGroupDataLookupSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *jcGroupDataLookupSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"groups": schema.ListNestedAttribute{
 				Computed:            true,
-				Description:         "A list of Jumpcloud User Groups",
-				MarkdownDescription: "A list of Jumpcloud User Groups",
+				Description:         "A list of Jumpcloud Groups",
+				MarkdownDescription: "A list of Jumpcloud Groups",
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{
 							Computed:            true,
-							Description:         "The ID of the User Group",
-							MarkdownDescription: "The ID of the User Group",
+							Description:         "The ID of the Group",
+							MarkdownDescription: "The ID of the Group",
 						},
 						"name": schema.StringAttribute{
 							Computed:            true,
-							Description:         "The Name of the User Group",
-							MarkdownDescription: "The Name of the User Group",
+							Description:         "The Name of the Group",
+							MarkdownDescription: "The Name of the Group",
 						},
 						"description": schema.StringAttribute{
 							Computed: true,
@@ -80,8 +80,8 @@ func (d *jcUserGroupDataLookupSource) Schema(_ context.Context, _ datasource.Sch
 						},
 						"members": schema.SetAttribute{
 							Computed:            true,
-							Description:         "The members of the User Group",
-							MarkdownDescription: "The members of the User Group",
+							Description:         "The members of the Group",
+							MarkdownDescription: "The members of the Group",
 							ElementType:         types.StringType,
 						},
 					},
@@ -104,9 +104,9 @@ func (d *jcUserGroupDataLookupSource) Schema(_ context.Context, _ datasource.Sch
 }
 
 // Read refreshes the Terraform state with the latest data.
-func (d *jcUserGroupDataLookupSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	// Get all user groups
-	var state jcUserGroupsLookupDataSourceModel
+func (d *jcGroupDataLookupSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+
+	var state jcGroupsLookupDataSourceModel
 	var name string
 	var limit int
 	//diags := req.State.Get(ctx, &state)
@@ -115,7 +115,7 @@ func (d *jcUserGroupDataLookupSource) Read(ctx context.Context, req datasource.R
 	diags = req.Config.GetAttribute(ctx, path.Root("limit"), &limit)
 	tflog.Info(ctx, fmt.Sprintf("Request: name %s, limit %d", name, limit))
 	if limit == 0 {
-		limit = 5
+		limit = 1
 	}
 	tflog.Info(ctx, fmt.Sprintf("Filters: %s : %v",
 		name,
@@ -130,16 +130,16 @@ func (d *jcUserGroupDataLookupSource) Read(ctx context.Context, req datasource.R
 	)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unable to Read Jumpcloud User Groups",
+			"Unable to Read Jumpcloud Groups",
 			err.Error(),
 		)
 		return
 	}
-	tflog.Info(ctx, fmt.Sprintf("Read Jumpcloud User Groups: %v", len(groups)))
+	tflog.Info(ctx, fmt.Sprintf("Read Jumpcloud Groups: %v", len(groups)))
 	if len(groups) == 0 {
 		resp.Diagnostics.AddError(
-			"Unable to Read Jumpcloud User Groups",
-			"No user groups found",
+			"Unable to Read Jumpcloud Groups",
+			"No groups found",
 		)
 		return
 	}
@@ -153,14 +153,14 @@ func (d *jcUserGroupDataLookupSource) Read(ctx context.Context, req datasource.R
 			memberEmails = append(memberEmails, types.StringValue(email))
 		}
 		returnedMembers, _ := types.SetValue(types.StringType, memberEmails)
-		jcUserGroupsLookupState := jcUserGroupsLookupModel{
+		jcGroupsLookupState := jcGroupsLookupModel{
 			ID:          types.StringValue(group.ID),
 			Name:        types.StringValue(group.Name),
 			Description: types.StringValue(group.Description),
 			Type:        types.StringValue(group.Type),
 			Members:     returnedMembers,
 		}
-		state.UserGroups = append(state.UserGroups, jcUserGroupsLookupState)
+		state.Groups = append(state.Groups, jcGroupsLookupState)
 	}
 	state.Limit = types.Int64Value(int64(limit))
 	state.Name = types.StringValue(name)
@@ -174,7 +174,7 @@ func (d *jcUserGroupDataLookupSource) Read(ctx context.Context, req datasource.R
 }
 
 // Configure adds the provider configured client to the data source.
-func (d *jcUserGroupDataLookupSource) Configure(_ context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (d *jcGroupDataLookupSource) Configure(_ context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
