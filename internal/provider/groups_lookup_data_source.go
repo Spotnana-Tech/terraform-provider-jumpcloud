@@ -3,7 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
-	"github.com/Spotnana-Tech/sec-jumpcloud-client-go"
+	jumpcloud "github.com/Spotnana-Tech/sec-jumpcloud-client-go"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -110,9 +110,9 @@ func (d *jcGroupDataLookupSource) Read(ctx context.Context, req datasource.ReadR
 	var name string
 	var limit int
 	//diags := req.State.Get(ctx, &state)
-	diags := req.Config.Get(ctx, &state)
-	diags = req.Config.GetAttribute(ctx, path.Root("name"), &name)
-	diags = req.Config.GetAttribute(ctx, path.Root("limit"), &limit)
+	diags := req.Config.Get(ctx, &state)                             //nolint:all
+	diags = req.Config.GetAttribute(ctx, path.Root("name"), &name)   //nolint:all
+	diags = req.Config.GetAttribute(ctx, path.Root("limit"), &limit) //nolint:all
 	tflog.Info(ctx, fmt.Sprintf("Request: name %s, limit %d", name, limit))
 	if limit == 0 {
 		limit = 1
