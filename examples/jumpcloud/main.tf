@@ -19,6 +19,10 @@ provider "jumpcloud" {
 # Pulls all usergroups from the JumpCloud API
 data "jumpcloud_usergroups" "all_usergroups" {}
 
+data "jumpcloud_group_lookup" "group_lookup" {
+  name  = "test"
+  limit = 1
+}
 # Pulls all apps from the JumpCloud API
 data "jumpcloud_apps" "all_apps" {}
 
