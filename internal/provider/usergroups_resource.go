@@ -8,6 +8,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"slices"
@@ -55,33 +57,51 @@ func (r *jcUserGroupsResource) Schema(_ context.Context, _ resource.SchemaReques
 				Computed:            true,
 				Description:         "User Group ID",
 				MarkdownDescription: "User Group ID",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"name": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
 				Description:         "User Group Name",
 				MarkdownDescription: "User Group Name",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"description": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
 				Description:         "User Group Description",
 				MarkdownDescription: "User Group Description",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"type": schema.StringAttribute{
 				Computed:            true,
 				Description:         "ex. user_group or device_group type",
 				MarkdownDescription: "ex. user_group or device_group type",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"email": schema.StringAttribute{
 				Computed:            true,
 				Description:         "User group email address",
 				MarkdownDescription: "User group email address",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"membership_method": schema.StringAttribute{
 				Computed:            true,
 				Description:         "Can be STATIC or DYNAMIC_AUTOMATED or DYNAMIC_REVIEW_REQUIRED",
 				MarkdownDescription: "Can be STATIC or DYNAMIC_AUTOMATED or DYNAMIC_REVIEW_REQUIRED",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"members": schema.SetAttribute{
 				Computed:            true,
