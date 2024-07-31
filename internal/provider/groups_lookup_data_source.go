@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"golang.org/x/exp/slices"
 )
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -146,11 +147,16 @@ func (d *jcGroupDataLookupSource) Read(ctx context.Context, req datasource.ReadR
 	// Map response to state
 	for _, group := range groups {
 		// Get the members
+		var memberStrings []string
 		var memberEmails []attr.Value // This is the terraform structure requirement
 		members, _ := d.client.GetGroupMembers(group.ID)
 		for _, member := range members {
 			email, _ := d.client.GetUserEmailFromID(member.To.ID)
-			memberEmails = append(memberEmails, types.StringValue(email))
+			// if email not in memberEmails
+			if !slices.Contains(memberStrings, email) {
+				memberStrings = append(memberStrings, email)
+				memberEmails = append(memberEmails, types.StringValue(email))
+			}
 		}
 		returnedMembers, _ := types.SetValue(types.StringType, memberEmails)
 		jcGroupsLookupState := jcGroupsLookupModel{
