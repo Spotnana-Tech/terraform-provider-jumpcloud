@@ -1,4 +1,7 @@
 # Jumpcloud Terraform Provider
+
+*This project is archived*
+
 A Terraform provider for managing Jumpcloud resources.
 
 _"Jumpcloud" is a trademark of Jumpcloud, Inc.
